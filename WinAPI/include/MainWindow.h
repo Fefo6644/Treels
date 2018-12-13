@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _MAINWINDOW_H_
+#define _MAINWINDOW_H_
 
 #include "basewin.h"
 
@@ -36,14 +37,16 @@ class MainWindow : public BaseWindow<MainWindow>
     void    DiscardGraphicsResources();
     void    OnPaint();
     void    Resize();
-	void	Automate();
+    void    Automate();
 
     HWND btn_inc;
     HWND btn_dec;
     HWND btn_rst;
     HWND btn_auto;
-	
-	std::thread t;
+
+    objs::Button btn;
+    
+    std::thread t;
 
 public:
 
@@ -54,3 +57,5 @@ public:
     PCWSTR  ClassName() const { return L"Window Class"; }
     LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 };
+
+#endif //_MAINWINDOW_H_

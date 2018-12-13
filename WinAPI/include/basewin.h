@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _BASEWIN_H_
+#define _BASEWIN_H_
 
 template <class DERIVED_TYPE>
 class BaseWindow
@@ -61,3 +62,5 @@ protected:
 
     HWND m_hwnd;
 };
+
+#endif //_BASEWIN_H_
