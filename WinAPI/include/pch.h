@@ -15,6 +15,10 @@
 #include <dwrite.h>
 #pragma comment(lib, "dwrite.lib")
 
+// C++ STL header files
 #define _USE_MATH_DEFINES
 #include <thread>
 #include <cmath>
+
+// Other header files
+#include "objs.h"

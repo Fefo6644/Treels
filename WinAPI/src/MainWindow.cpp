@@ -1,7 +1,5 @@
 #include "pch.h"
 
-#include "objs.h"
-
 #include "MainWindow.h"
 
 void MainWindow::CalculateLayout()
