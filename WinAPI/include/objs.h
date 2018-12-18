@@ -2,35 +2,21 @@
 #define _OBJS_H_
 
 namespace objs {
-    struct Location
+    typedef struct Location
     {
-    protected:
-        int _x;
-        int _y;
+        Location(int x, int y) : x(x), y(y) {}
 
-    public:
-        Location(int x, int y) : _x(x), _y(y) {}
+        int x;
+        int y;
+    } Location;
 
-        int GetX();
-        int GetY();
-        void SetX(int x);
-        void SetY(int y);
-    };
-
-    struct Size
+    typedef struct Size
     {
-    protected:
-        int _w;
-        int _h;
+        Size(int Width, int Height) : Width(Width), Height(Height) {}
 
-    public:
-        Size(int Width, int Height) : _w(Width), _h(Height) {}
-
-        int GetWidth();
-        int GetHeight();
-        void SetWidth(int Width);
-        void SetHeight(int Height);
-    };
+        int Width;
+        int Height;
+    } Size;
 
     class Button
     {

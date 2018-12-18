@@ -2,51 +2,6 @@
 
 #include "objs.h"
 
-
-// Location
-int objs::Location::GetX()
-{
-    return _x;
-}
-
-int objs::Location::GetY()
-{
-    return _y;
-}
-
-void objs::Location::SetX(int x)
-{
-    _x = x;
-}
-
-void objs::Location::SetY(int y)
-{
-    _y = y;
-}
-
-
-// Size
-int objs::Size::GetWidth()
-{
-    return _w;
-}
-
-int objs::Size::GetHeight()
-{
-    return _h;
-}
-
-void objs::Size::SetWidth(int Width)
-{
-    _w = Width;
-}
-
-void objs::Size::SetHeight(int Height)
-{
-    _h = Height;
-}
-
-
 // Button
 BOOL objs::Button::Create(HWND parentWindow, LPCWSTR text, Style style, Location location, Size size)
 {
@@ -55,17 +10,17 @@ BOOL objs::Button::Create(HWND parentWindow, LPCWSTR text, Style style, Location
         L"BUTTON",
         text,
         WS_VISIBLE | WS_TABSTOP | WS_CHILD | style,
-        location.GetX(), location.GetY(),
-        size.GetWidth(), size.GetHeight(),
+        location.x, location.y,
+        size.Width, size.Height,
         parentWindow, NULL, (HINSTANCE)GetWindowLongPtr(parentWindow, GWLP_HINSTANCE), NULL);
 
     if (m_hwnd == NULL)
         return FALSE;
 
-    m_x = location.GetX();
-    m_y = location.GetY();
-    m_w = size.GetWidth();
-    m_h = size.GetHeight();
+    m_x = location.x;
+    m_y = location.y;
+    m_w = size.Width;
+    m_h = size.Height;
 
     return TRUE;
 }
@@ -94,8 +49,8 @@ void objs::Button::SetLocation(int x, int y)
 
 void objs::Button::SetLocation(Location location)
 {
-    m_x = location.GetX();
-    m_y = location.GetY();
+    m_x = location.x;
+    m_y = location.y;
 
 }
 
@@ -108,7 +63,7 @@ void objs::Button::SetSize(int Width, int Height)
 
 void objs::Button::SetSize(Size size)
 {
-    m_w = size.GetWidth();
-    m_h = size.GetHeight();
+    m_w = size.Width;
+    m_h = size.Height;
 
 }

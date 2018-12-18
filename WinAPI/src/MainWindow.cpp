@@ -139,7 +139,7 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
         if (btn.Create(m_hwnd, L"aaaaaa", objs::Button::ClassicButton, objs::Location(10, 200), objs::Size(60, 20)) == FALSE)
             return -1;
-        
+
         btn_inc = CreateWindow(
             L"BUTTON", L"Increase",
             WS_VISIBLE | WS_TABSTOP | WS_CHILD | BS_DEFPUSHBUTTON,

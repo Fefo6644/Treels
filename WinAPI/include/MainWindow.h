@@ -1,6 +1,7 @@
 #ifndef _MAINWINDOW_H_
 #define _MAINWINDOW_H_
 
+#include "objs.h"
 #include "basewin.h"
 
 template <class T> void SafeRelease(T **ppT)

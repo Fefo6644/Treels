@@ -32,10 +32,10 @@
     <ClInclude Include="include\MainWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\objs.h">
+    <ClInclude Include="include\pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\pch.h">
+    <ClInclude Include="include\objs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
