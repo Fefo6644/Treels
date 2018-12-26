@@ -29,16 +29,23 @@ class MainWindow : public BaseWindow<MainWindow>
     IDWriteTextFormat   *pWriteTextFormat;
 
     size_t  vertices = 10;
-    //size_t  step = 1;
+    size_t  step = 1;
+    float   fVertices = 1.0f;
+    float   fStep = 0.1f;
     BOOL    isAutomated = FALSE;
     BOOL    mtResize = FALSE;
+    BOOL    useFloat = FALSE;
 
     void    CalculateLayout();
     HRESULT CreateGraphicsResources();
     void    DiscardGraphicsResources();
     void    OnPaint();
     void    Resize();
+    void    Increment();
+    void    Decrement();
+    void    Reset();
     void    Automate();
+    int     OnCreate();
 
     HWND btn_inc;
     HWND btn_dec;
@@ -46,7 +53,7 @@ class MainWindow : public BaseWindow<MainWindow>
     HWND btn_auto;
 
     objs::Button btn;
-    
+
     std::thread t;
 
 public:

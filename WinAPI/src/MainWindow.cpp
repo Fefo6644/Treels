@@ -83,25 +83,45 @@ void MainWindow::OnPaint()
         pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
         pRenderTarget->DrawEllipse(ellipse, pBrushEllipse);
 
-        _gcvt_s(buff, 7, (vertices / 10.0f), ((vertices >= 100) ? 4 : 3));
+        if (useFloat == FALSE)
+            _gcvt_s(buff, 7, (vertices / 10.0f), ((vertices >= 100) ? 4 : 3));
+        else
+            _gcvt_s(buff, 7, fVertices, ((fVertices >= 10) ? 4 : 3));
+
         mbstowcs_s(NULL, text, 7, buff, 7);
 
         pRenderTarget->DrawTextW(text, (UINT32)wcslen(text), pWriteTextFormat, rcText, pBrushLine);
 
-        for (size_t i = 0; i < (vertices / 10.0f); i++)
-        {
-            for (size_t j = 1; j < (vertices / 10.0f) - i; j++)
+        if (useFloat == FALSE)
+            for (size_t i = 0; i < (vertices / 10.0f); i++)
             {
-                pRenderTarget->DrawLine(
-                    D2D1::Point2F(
-                        ellipse.radiusX * cosf(i * 2.0f * (float)M_PI / (vertices / 10.0f)) + ellipse.point.x,
-                        ellipse.radiusY * -sinf(i * 2.0f * (float)M_PI / (vertices / 10.0f)) + ellipse.point.y),
-                    D2D1::Point2F(
-                        ellipse.radiusX * cosf((j + i) * 2.0f * (float)M_PI / (vertices / 10.0f)) + ellipse.point.x,
-                        ellipse.radiusY * -sinf((j + i) * 2.0f * (float)M_PI / (vertices / 10.0f)) + ellipse.point.y),
-                    pBrushLine);
+                for (size_t j = 1; j < (vertices / 10.0f) - i; j++)
+                {
+                    pRenderTarget->DrawLine(
+                        D2D1::Point2F(
+                            ellipse.radiusX * cosf(i * 2.0f * (float)M_PI / (vertices / 10.0f)) + ellipse.point.x,
+                            ellipse.radiusY * -sinf(i * 2.0f * (float)M_PI / (vertices / 10.0f)) + ellipse.point.y),
+                        D2D1::Point2F(
+                            ellipse.radiusX * cosf((j + i) * 2.0f * (float)M_PI / (vertices / 10.0f)) + ellipse.point.x,
+                            ellipse.radiusY * -sinf((j + i) * 2.0f * (float)M_PI / (vertices / 10.0f)) + ellipse.point.y),
+                        pBrushLine);
+                }
             }
-        }
+        else
+            for (size_t i = 0; i < fVertices; i++)
+            {
+                for (size_t j = 1; j < fVertices - i; j++)
+                {
+                    pRenderTarget->DrawLine(
+                        D2D1::Point2F(
+                            ellipse.radiusX * cosf(i * 2.0f * (float)M_PI / fVertices) + ellipse.point.x,
+                            ellipse.radiusY * -sinf(i * 2.0f * (float)M_PI / fVertices) + ellipse.point.y),
+                        D2D1::Point2F(
+                            ellipse.radiusX * cosf((j + i) * 2.0f * (float)M_PI / fVertices) + ellipse.point.x,
+                            ellipse.radiusY * -sinf((j + i) * 2.0f * (float)M_PI / fVertices) + ellipse.point.y),
+                        pBrushLine);
+                }
+            }
 
         hr = pRenderTarget->EndDraw();
         if (FAILED(hr) || hr == D2DERR_RECREATE_TARGET)
@@ -131,44 +151,7 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
     switch (uMsg)
     {
     case WM_CREATE:
-        if (FAILED(D2D1CreateFactory(D2D1_FACTORY_TYPE_MULTI_THREADED, &pFactory)))
-            return -1;
-
-        if (FAILED(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(&pWriteFactory))))
-            return -1;
-
-        if (btn.Create(m_hwnd, L"aaaaaa", objs::Button::ClassicButton, objs::Location(10, 200), objs::Size(60, 20)) == FALSE)
-            return -1;
-
-        btn_inc = CreateWindow(
-            L"BUTTON", L"Increase",
-            WS_VISIBLE | WS_TABSTOP | WS_CHILD | BS_DEFPUSHBUTTON,
-            10, 10,
-            75, 25,
-            m_hwnd, NULL, (HINSTANCE)GetWindowLongPtr(m_hwnd, GWLP_HINSTANCE), NULL);
-
-        btn_dec = CreateWindow(
-            L"BUTTON", L"Decrease",
-            WS_VISIBLE | WS_TABSTOP | WS_CHILD | BS_DEFPUSHBUTTON,
-            10, 40,
-            75, 25,
-            m_hwnd, NULL, (HINSTANCE)GetWindowLongPtr(m_hwnd, GWLP_HINSTANCE), NULL);
-
-        btn_rst = CreateWindow(
-            L"BUTTON", L"Reset",
-            WS_VISIBLE | WS_TABSTOP | WS_CHILD | BS_DEFPUSHBUTTON,
-            10, 70,
-            75, 25,
-            m_hwnd, NULL, (HINSTANCE)GetWindowLongPtr(m_hwnd, GWLP_HINSTANCE), NULL);
-
-        btn_auto = CreateWindow(
-            L"BUTTON", L"Automate",
-            WS_VISIBLE | WS_TABSTOP | WS_CHILD | BS_DEFPUSHBUTTON,
-            10, 100,
-            75, 25,
-            m_hwnd, NULL, (HINSTANCE)GetWindowLongPtr(m_hwnd, GWLP_HINSTANCE), NULL);
-
-        return 0;
+        return OnCreate();
 
     case WM_CLOSE:
         isAutomated = FALSE;
@@ -194,52 +177,84 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
     case WM_COMMAND:
     case BN_CLICKED:
         if ((HWND)lParam == btn_inc)
-            vertices = (vertices >= 500) ? 10 : vertices + 1;
-        else if ((HWND)lParam == btn_dec)
-            vertices = (vertices < 11) ? 500 : vertices - 1;
-        else if ((HWND)lParam == btn_rst)
         {
-            if (isAutomated == TRUE)
-            {
-                isAutomated = FALSE;
-                Sleep(20);
-            }
-
-            vertices = 10;
+            Increment();
+            return 0;
         }
-        else if ((HWND)lParam == btn_auto)
+
+        if ((HWND)lParam == btn_dec)
+        {
+            Decrement();
+            return 0;
+        }
+
+        if ((HWND)lParam == btn_rst)
+        {
+            Reset();
+            return 0;
+        }
+
+        if ((HWND)lParam == btn_auto)
         {
             t = std::thread(&MainWindow::Automate, this);
             t.detach();
+            return 0;
         }
 
-        OnPaint();
-        InvalidateRect(m_hwnd, NULL, FALSE);
-
-        return 0;
-
-        break;
+        if ((HWND)lParam == btn.GetWindowHandle())
+        {
+            return 0;
+        }
 
     }
     return DefWindowProc(m_hwnd, uMsg, wParam, lParam);
 }
 
+void MainWindow::Increment()
+{
+    vertices = (vertices >= 500) ? 10 : vertices + 1;
+    //OnPaint();        //////////////////////// WHY DOES IT WORK!!!!!!??????????????????????????????????
+    InvalidateRect(m_hwnd, NULL, FALSE);
+}
+
+void MainWindow::Decrement()
+{
+    vertices = (vertices < 11) ? 500 : vertices - 1;
+    //OnPaint();        //////////////////////// WHY DOES IT WORK!!!!!!??????????????????????????????????
+    InvalidateRect(m_hwnd, NULL, FALSE);
+}
+
+void MainWindow::Reset()
+{
+    if (isAutomated == TRUE)
+    {
+        isAutomated = FALSE;
+        Sleep(20);
+    }
+    vertices = 10;
+
+    OnPaint();
+    InvalidateRect(m_hwnd, NULL, FALSE);
+}
+
 void MainWindow::Automate()
 {
+    useFloat = TRUE;
+
     isAutomated = TRUE;
 
     Button_Enable(btn_inc, FALSE);
     Button_Enable(btn_dec, FALSE);
     Button_Enable(btn_auto, FALSE);
+    Button_Enable(btn.GetWindowHandle(), FALSE);
     Button_SetText(btn_rst, L"Stop");
 
-    vertices = 10;
-    //step = 1;
-    while (vertices < 500 && isAutomated == TRUE)
+    fVertices = 1.0f;
+    fStep = 0.1f;
+    while (fVertices < 50.0f && isAutomated == TRUE)
     {
-        vertices++;
-        //vertices += step;
-        //step -= 1;
+        fVertices += fStep;
+        fStep -= 0.0001f;
 
         if (mtResize)
         {
@@ -251,11 +266,10 @@ void MainWindow::Automate()
         InvalidateRect(m_hwnd, NULL, FALSE);
     }
 
-    while (vertices > 10 && isAutomated == TRUE)
+    while (fVertices > 1.0f && isAutomated == TRUE)
     {
-        vertices--;
-        //vertices -= step;
-        //step += 1;
+        fVertices -= fStep;
+        fStep += 0.0001f;
 
         if (mtResize)
         {
@@ -266,13 +280,60 @@ void MainWindow::Automate()
         OnPaint();
         InvalidateRect(m_hwnd, NULL, FALSE);
     }
-    vertices = 10;
-    //step = 1;
+    fVertices = 1.0f;
+    fStep = 0.1f;
 
     Button_Enable(btn_inc, TRUE);
     Button_Enable(btn_dec, TRUE);
     Button_Enable(btn_auto, TRUE);
+    Button_Enable(btn.GetWindowHandle(), TRUE);
     Button_SetText(btn_rst, L"Reset");
 
+    InvalidateRect(m_hwnd, NULL, FALSE);
+
     isAutomated = FALSE;
+
+    useFloat = FALSE;
+}
+
+int MainWindow::OnCreate()
+{
+    if (FAILED(D2D1CreateFactory(D2D1_FACTORY_TYPE_MULTI_THREADED, &pFactory)))
+        return -1;
+
+    if (FAILED(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(&pWriteFactory))))
+        return -1;
+
+    if (btn.Create(m_hwnd, L"aaaaaa", objs::Button::ClassicButton, objs::Location(10, 200), objs::Size(60, 20)) == FALSE)
+        return -1;
+
+    btn_inc = CreateWindow(
+        L"BUTTON", L"Increase",
+        WS_VISIBLE | WS_TABSTOP | WS_CHILD | BS_DEFPUSHBUTTON,
+        10, 10,
+        75, 25,
+        m_hwnd, NULL, (HINSTANCE)GetWindowLongPtr(m_hwnd, GWLP_HINSTANCE), NULL);
+
+    btn_dec = CreateWindow(
+        L"BUTTON", L"Decrease",
+        WS_VISIBLE | WS_TABSTOP | WS_CHILD | BS_DEFPUSHBUTTON,
+        10, 40,
+        75, 25,
+        m_hwnd, NULL, (HINSTANCE)GetWindowLongPtr(m_hwnd, GWLP_HINSTANCE), NULL);
+
+    btn_rst = CreateWindow(
+        L"BUTTON", L"Reset",
+        WS_VISIBLE | WS_TABSTOP | WS_CHILD | BS_DEFPUSHBUTTON,
+        10, 70,
+        75, 25,
+        m_hwnd, NULL, (HINSTANCE)GetWindowLongPtr(m_hwnd, GWLP_HINSTANCE), NULL);
+
+    btn_auto = CreateWindow(
+        L"BUTTON", L"Automate",
+        WS_VISIBLE | WS_TABSTOP | WS_CHILD | BS_DEFPUSHBUTTON,
+        10, 100,
+        75, 25,
+        m_hwnd, NULL, (HINSTANCE)GetWindowLongPtr(m_hwnd, GWLP_HINSTANCE), NULL);
+
+    return 0;
 }
