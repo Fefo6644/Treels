@@ -47,12 +47,10 @@ class MainWindow : public BaseWindow<MainWindow>
     void    Automate();
     int     OnCreate();
 
-    HWND btn_inc;
-    HWND btn_dec;
-    HWND btn_rst;
-    HWND btn_auto;
-
-    objs::Button btn;
+    objs::Button btn_inc;
+    objs::Button btn_dec;
+    objs::Button btn_rst;
+    objs::Button btn_auto;
 
     std::thread t;
 

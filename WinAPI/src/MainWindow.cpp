@@ -176,36 +176,30 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
     case WM_COMMAND:
     case BN_CLICKED:
-        if ((HWND)lParam == btn_inc)
+        if ((HWND)lParam == btn_inc.GetWindowHandle())
         {
             Increment();
             return 0;
         }
 
-        if ((HWND)lParam == btn_dec)
+        if ((HWND)lParam == btn_dec.GetWindowHandle())
         {
             Decrement();
             return 0;
         }
 
-        if ((HWND)lParam == btn_rst)
+        if ((HWND)lParam == btn_rst.GetWindowHandle())
         {
             Reset();
             return 0;
         }
 
-        if ((HWND)lParam == btn_auto)
+        if ((HWND)lParam == btn_auto.GetWindowHandle())
         {
             t = std::thread(&MainWindow::Automate, this);
             t.detach();
             return 0;
         }
-
-        if ((HWND)lParam == btn.GetWindowHandle())
-        {
-            return 0;
-        }
-
     }
     return DefWindowProc(m_hwnd, uMsg, wParam, lParam);
 }
@@ -229,7 +223,7 @@ void MainWindow::Reset()
     if (isAutomated == TRUE)
     {
         isAutomated = FALSE;
-        Sleep(20);
+        Sleep(25);
     }
     vertices = 10;
 
@@ -243,11 +237,10 @@ void MainWindow::Automate()
 
     isAutomated = TRUE;
 
-    Button_Enable(btn_inc, FALSE);
-    Button_Enable(btn_dec, FALSE);
-    Button_Enable(btn_auto, FALSE);
-    Button_Enable(btn.GetWindowHandle(), FALSE);
-    Button_SetText(btn_rst, L"Stop");
+    Button_Enable(btn_inc.GetWindowHandle(), FALSE);
+    Button_Enable(btn_dec.GetWindowHandle(), FALSE);
+    Button_Enable(btn_auto.GetWindowHandle(), FALSE);
+    Button_SetText(btn_rst.GetWindowHandle(), L"Stop");
 
     fVertices = 1.0f;
     fStep = 0.1f;
@@ -283,11 +276,10 @@ void MainWindow::Automate()
     fVertices = 1.0f;
     fStep = 0.1f;
 
-    Button_Enable(btn_inc, TRUE);
-    Button_Enable(btn_dec, TRUE);
-    Button_Enable(btn_auto, TRUE);
-    Button_Enable(btn.GetWindowHandle(), TRUE);
-    Button_SetText(btn_rst, L"Reset");
+    Button_Enable(btn_inc.GetWindowHandle(), TRUE);
+    Button_Enable(btn_dec.GetWindowHandle(), TRUE);
+    Button_Enable(btn_auto.GetWindowHandle(), TRUE);
+    Button_SetText(btn_rst.GetWindowHandle(), L"Reset");
 
     InvalidateRect(m_hwnd, NULL, FALSE);
 
@@ -304,36 +296,18 @@ int MainWindow::OnCreate()
     if (FAILED(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(&pWriteFactory))))
         return -1;
 
-    if (btn.Create(m_hwnd, L"aaaaaa", objs::Button::ClassicButton, objs::Location(10, 200), objs::Size(60, 20)) == FALSE)
+
+    if (btn_inc.Create(m_hwnd, L"Increase", objs::Button::ClassicButton, objs::Location(10, 10), objs::Size(75, 25)) == FALSE)
         return -1;
 
-    btn_inc = CreateWindow(
-        L"BUTTON", L"Increase",
-        WS_VISIBLE | WS_TABSTOP | WS_CHILD | BS_DEFPUSHBUTTON,
-        10, 10,
-        75, 25,
-        m_hwnd, NULL, (HINSTANCE)GetWindowLongPtr(m_hwnd, GWLP_HINSTANCE), NULL);
+    if (btn_dec.Create(m_hwnd, L"Decrease", objs::Button::ClassicButton, objs::Location(10, 40), objs::Size(75, 25)) == FALSE)
+        return -1;
 
-    btn_dec = CreateWindow(
-        L"BUTTON", L"Decrease",
-        WS_VISIBLE | WS_TABSTOP | WS_CHILD | BS_DEFPUSHBUTTON,
-        10, 40,
-        75, 25,
-        m_hwnd, NULL, (HINSTANCE)GetWindowLongPtr(m_hwnd, GWLP_HINSTANCE), NULL);
+    if (btn_rst.Create(m_hwnd, L"Reset", objs::Button::ClassicButton, objs::Location(10, 70), objs::Size(75, 25)) == FALSE)
+        return -1;
 
-    btn_rst = CreateWindow(
-        L"BUTTON", L"Reset",
-        WS_VISIBLE | WS_TABSTOP | WS_CHILD | BS_DEFPUSHBUTTON,
-        10, 70,
-        75, 25,
-        m_hwnd, NULL, (HINSTANCE)GetWindowLongPtr(m_hwnd, GWLP_HINSTANCE), NULL);
-
-    btn_auto = CreateWindow(
-        L"BUTTON", L"Automate",
-        WS_VISIBLE | WS_TABSTOP | WS_CHILD | BS_DEFPUSHBUTTON,
-        10, 100,
-        75, 25,
-        m_hwnd, NULL, (HINSTANCE)GetWindowLongPtr(m_hwnd, GWLP_HINSTANCE), NULL);
+    if (btn_auto.Create(m_hwnd, L"Automate", objs::Button::ClassicButton, objs::Location(10, 100), objs::Size(75, 25)) == FALSE)
+        return -1;
 
     return 0;
 }
