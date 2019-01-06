@@ -2,7 +2,7 @@
 
 #ifndef UNICODE
 #define UNICODE
-#endif // !UNICODE
+#endif // UNICODE
 
 // Windows header files
 #include <Windows.h>

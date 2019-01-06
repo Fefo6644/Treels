@@ -2,6 +2,8 @@
 #define _OBJS_H_
 
 namespace objs {
+
+    /************************** Generic structs: Location and Size **************************/
     typedef struct Location
     {
         Location(int x, int y) : x(x), y(y) {}
@@ -18,6 +20,7 @@ namespace objs {
         int Height;
     } Size;
 
+    /************************** Button **************************/
     class Button
     {
     public:
@@ -48,7 +51,33 @@ namespace objs {
         int m_w;
         int m_h;
         HWND m_hwnd;
-    };
+    }; // Button
+
+    /************************** Slider **************************/
+    class Slider
+    {
+    public:
+
+        BOOL Create(HWND parentWindow, Location location = Location(10, 10), Size size = Size(100, 50), UINT16 maxValue = 10, BOOL autoTicks = TRUE);
+
+        Location    GetLocation();
+        Size        GetSize();
+        HWND        GetWindowHandle();
+
+        void        SetLocation(int x, int y);
+        void        SetLocation(Location location);
+        void        SetSize(int Width, int Height);
+        void        SetSize(Size size);
+
+        Slider() : m_x(NULL), m_y(NULL), m_w(NULL), m_h(NULL), m_hwnd(NULL) {}
+
+    protected:
+        int m_x;
+        int m_y;
+        int m_w;
+        int m_h;
+        HWND m_hwnd;
+    }; // Slider
 }
 
-#endif //_OBJS_H_
+#endif // _OBJS_H_

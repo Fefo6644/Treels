@@ -174,31 +174,37 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
             mtResize = TRUE;
         return isAutomated;
 
-    case WM_COMMAND:
-    case BN_CLICKED:
-        if ((HWND)lParam == btn_inc.GetWindowHandle())
+    case WM_KEYDOWN:
+        switch (wParam)
         {
+        case VK_UP:
             Increment();
             return 0;
-        }
 
-        if ((HWND)lParam == btn_dec.GetWindowHandle())
-        {
+        case VK_DOWN:
             Decrement();
             return 0;
-        }
 
-        if ((HWND)lParam == btn_rst.GetWindowHandle())
-        {
-            Reset();
-            return 0;
-        }
-
-        if ((HWND)lParam == btn_auto.GetWindowHandle())
-        {
+        case 0x41:      // A
             t = std::thread(&MainWindow::Automate, this);
             t.detach();
             return 0;
+
+        case 0x52:      // R
+            Reset();
+            return 0;
+
+        case 0x57:      // W - intended to use with CTRL to close the window.
+            if (GetKeyState(VK_LCONTROL) & 0x8000)
+            {
+                isAutomated = FALSE;
+                DiscardGraphicsResources();
+                PostQuitMessage(0);
+                return 0;
+            }
+
+        default:
+            break;
         }
     }
     return DefWindowProc(m_hwnd, uMsg, wParam, lParam);
@@ -237,11 +243,6 @@ void MainWindow::Automate()
 
     isAutomated = TRUE;
 
-    Button_Enable(btn_inc.GetWindowHandle(), FALSE);
-    Button_Enable(btn_dec.GetWindowHandle(), FALSE);
-    Button_Enable(btn_auto.GetWindowHandle(), FALSE);
-    Button_SetText(btn_rst.GetWindowHandle(), L"Stop");
-
     fVertices = 1.0f;
     fStep = 0.1f;
     while (fVertices < 50.0f && isAutomated == TRUE)
@@ -276,11 +277,6 @@ void MainWindow::Automate()
     fVertices = 1.0f;
     fStep = 0.1f;
 
-    Button_Enable(btn_inc.GetWindowHandle(), TRUE);
-    Button_Enable(btn_dec.GetWindowHandle(), TRUE);
-    Button_Enable(btn_auto.GetWindowHandle(), TRUE);
-    Button_SetText(btn_rst.GetWindowHandle(), L"Reset");
-
     InvalidateRect(m_hwnd, NULL, FALSE);
 
     isAutomated = FALSE;
@@ -294,19 +290,6 @@ int MainWindow::OnCreate()
         return -1;
 
     if (FAILED(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(&pWriteFactory))))
-        return -1;
-
-
-    if (btn_inc.Create(m_hwnd, L"Increase", objs::Button::ClassicButton, objs::Location(10, 10), objs::Size(75, 25)) == FALSE)
-        return -1;
-
-    if (btn_dec.Create(m_hwnd, L"Decrease", objs::Button::ClassicButton, objs::Location(10, 40), objs::Size(75, 25)) == FALSE)
-        return -1;
-
-    if (btn_rst.Create(m_hwnd, L"Reset", objs::Button::ClassicButton, objs::Location(10, 70), objs::Size(75, 25)) == FALSE)
-        return -1;
-
-    if (btn_auto.Create(m_hwnd, L"Automate", objs::Button::ClassicButton, objs::Location(10, 100), objs::Size(75, 25)) == FALSE)
         return -1;
 
     return 0;

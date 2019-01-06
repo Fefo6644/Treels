@@ -12,3 +12,5 @@
 // reference additional headers your program requires here
 
 #include <Windows.h>
+#include <CommCtrl.h>
+#include <windowsx.h>

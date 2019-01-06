@@ -21,7 +21,7 @@ class MainWindow : public BaseWindow<MainWindow>
     ID2D1SolidColorBrush    *pBrushLine;
     D2D1_ELLIPSE            ellipse;
 
-    const D2D1_RECT_F rcText = D2D1::RectF(10.0f, 130.0f, 1000.0f, 1000.0f);
+    const D2D1_RECT_F rcText = D2D1::RectF(10.0f, 10.0f, 1000.0f, 1000.0f);
     CHAR buff[7];
     WCHAR text[7];
 
@@ -47,11 +47,6 @@ class MainWindow : public BaseWindow<MainWindow>
     void    Automate();
     int     OnCreate();
 
-    objs::Button btn_inc;
-    objs::Button btn_dec;
-    objs::Button btn_rst;
-    objs::Button btn_auto;
-
     std::thread t;
 
 public:
@@ -64,4 +59,4 @@ public:
     LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 };
 
-#endif //_MAINWINDOW_H_
+#endif // _MAINWINDOW_H_
