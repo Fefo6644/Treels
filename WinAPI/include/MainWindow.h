@@ -22,15 +22,15 @@ class MainWindow : public BaseWindow<MainWindow>
     D2D1_ELLIPSE            ellipse;
 
     const D2D1_RECT_F rcText = D2D1::RectF(10.0f, 10.0f, 1000.0f, 1000.0f);
-    CHAR buff[7];
-    WCHAR text[7];
+    CHAR buff[13];
+    WCHAR text[13];
 
     IDWriteFactory      *pWriteFactory;
     IDWriteTextFormat   *pWriteTextFormat;
 
-    size_t  vertices = 10;
+    size_t  multiplier = 0;
     size_t  step = 1;
-    float   fVertices = 1.0f;
+    float   fMultiplier = 0.0f;
     float   fStep = 0.1f;
     BOOL    isAutomated = FALSE;
     BOOL    mtResize = FALSE;

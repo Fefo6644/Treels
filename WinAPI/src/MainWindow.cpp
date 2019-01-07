@@ -84,43 +84,37 @@ void MainWindow::OnPaint()
         pRenderTarget->DrawEllipse(ellipse, pBrushEllipse);
 
         if (useFloat == FALSE)
-            _gcvt_s(buff, 7, (vertices / 10.0f), ((vertices >= 100) ? 4 : 3));
+            _gcvt_s(buff, 13, (multiplier / 100.0f), 4);
         else
-            _gcvt_s(buff, 7, fVertices, ((fVertices >= 10) ? 4 : 3));
+            _gcvt_s(buff, 13, fMultiplier, 4);
 
-        mbstowcs_s(NULL, text, 7, buff, 7);
+        mbstowcs_s(NULL, text, 13, buff, 13);
 
         pRenderTarget->DrawTextW(text, (UINT32)wcslen(text), pWriteTextFormat, rcText, pBrushLine);
 
         if (useFloat == FALSE)
-            for (size_t i = 0; i < (vertices / 10.0f); i++)
+            for (size_t i = 0; i < 360; i++)
             {
-                for (size_t j = 1; j < (vertices / 10.0f) - i; j++)
-                {
-                    pRenderTarget->DrawLine(
-                        D2D1::Point2F(
-                            ellipse.radiusX * cosf(i * 2.0f * (float)M_PI / (vertices / 10.0f)) + ellipse.point.x,
-                            ellipse.radiusY * -sinf(i * 2.0f * (float)M_PI / (vertices / 10.0f)) + ellipse.point.y),
-                        D2D1::Point2F(
-                            ellipse.radiusX * cosf((j + i) * 2.0f * (float)M_PI / (vertices / 10.0f)) + ellipse.point.x,
-                            ellipse.radiusY * -sinf((j + i) * 2.0f * (float)M_PI / (vertices / 10.0f)) + ellipse.point.y),
-                        pBrushLine);
-                }
+                pRenderTarget->DrawLine(
+                    D2D1::Point2F(
+                        ellipse.radiusX * cosf(i * (float)M_PI / 180.0f) + ellipse.point.x,
+                        ellipse.radiusY * -sinf(i * (float)M_PI / 180.0f) + ellipse.point.y),
+                    D2D1::Point2F(
+                        ellipse.radiusX * cosf(i * (float)M_PI / 180.0f * (multiplier / 100.0f)) + ellipse.point.x,
+                        ellipse.radiusY * -sinf(i * (float)M_PI / 180.0f * (multiplier / 100.0f)) + ellipse.point.y),
+                    pBrushLine);
             }
         else
-            for (size_t i = 0; i < fVertices; i++)
+            for (size_t i = 0; i < 360; i++)
             {
-                for (size_t j = 1; j < fVertices - i; j++)
-                {
-                    pRenderTarget->DrawLine(
-                        D2D1::Point2F(
-                            ellipse.radiusX * cosf(i * 2.0f * (float)M_PI / fVertices) + ellipse.point.x,
-                            ellipse.radiusY * -sinf(i * 2.0f * (float)M_PI / fVertices) + ellipse.point.y),
-                        D2D1::Point2F(
-                            ellipse.radiusX * cosf((j + i) * 2.0f * (float)M_PI / fVertices) + ellipse.point.x,
-                            ellipse.radiusY * -sinf((j + i) * 2.0f * (float)M_PI / fVertices) + ellipse.point.y),
-                        pBrushLine);
-                }
+                pRenderTarget->DrawLine(
+                    D2D1::Point2F(
+                        ellipse.radiusX * cosf(i * (float)M_PI / 180.0f) + ellipse.point.x,
+                        ellipse.radiusY * -sinf(i * (float)M_PI / 180.0f) + ellipse.point.y),
+                    D2D1::Point2F(
+                        ellipse.radiusX * cosf(i * (float)M_PI / 180.0f * fMultiplier) + ellipse.point.x,
+                        ellipse.radiusY * -sinf(i * (float)M_PI / 180.0f * fMultiplier) + ellipse.point.y),
+                    pBrushLine);
             }
 
         hr = pRenderTarget->EndDraw();
@@ -190,6 +184,16 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
             t.detach();
             return 0;
 
+        case 0x47:      // G - for Golden number.
+            fMultiplier = (1 + sqrtf(5.0f)) / 2.0f;
+            multiplier = (size_t)((1 + sqrtf(5.0f)) / 2.0f * 100);
+            useFloat = TRUE;
+            OnPaint();
+            //InvalidateRect(m_hwnd, NULL, FALSE);        //////////////////////// WHY DOES IT WORK!!!!!!??????????????????????????????????
+            useFloat = FALSE;
+            fMultiplier = 0.0f;
+            return 0;
+
         case 0x52:      // R
             Reset();
             return 0;
@@ -212,14 +216,14 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 void MainWindow::Increment()
 {
-    vertices = (vertices >= 500) ? 10 : vertices + 1;
+    multiplier = (multiplier >= 5000) ? 0 : multiplier + step;
     //OnPaint();        //////////////////////// WHY DOES IT WORK!!!!!!??????????????????????????????????
     InvalidateRect(m_hwnd, NULL, FALSE);
 }
 
 void MainWindow::Decrement()
 {
-    vertices = (vertices < 11) ? 500 : vertices - 1;
+    multiplier = (multiplier < 1) ? 5000 : multiplier - step;
     //OnPaint();        //////////////////////// WHY DOES IT WORK!!!!!!??????????????????????????????????
     InvalidateRect(m_hwnd, NULL, FALSE);
 }
@@ -231,7 +235,7 @@ void MainWindow::Reset()
         isAutomated = FALSE;
         Sleep(25);
     }
-    vertices = 10;
+    multiplier = 0;
 
     OnPaint();
     InvalidateRect(m_hwnd, NULL, FALSE);
@@ -243,11 +247,11 @@ void MainWindow::Automate()
 
     isAutomated = TRUE;
 
-    fVertices = 1.0f;
+    fMultiplier = 1.0f;
     fStep = 0.1f;
-    while (fVertices < 50.0f && isAutomated == TRUE)
+    while (fMultiplier < 50.0f && isAutomated == TRUE)
     {
-        fVertices += fStep;
+        fMultiplier += fStep;
         fStep -= 0.0001f;
 
         if (mtResize)
@@ -260,9 +264,9 @@ void MainWindow::Automate()
         InvalidateRect(m_hwnd, NULL, FALSE);
     }
 
-    while (fVertices > 1.0f && isAutomated == TRUE)
+    while (fMultiplier > 1.0f && isAutomated == TRUE)
     {
-        fVertices -= fStep;
+        fMultiplier -= fStep;
         fStep += 0.0001f;
 
         if (mtResize)
@@ -274,7 +278,7 @@ void MainWindow::Automate()
         OnPaint();
         InvalidateRect(m_hwnd, NULL, FALSE);
     }
-    fVertices = 1.0f;
+    fMultiplier = 1.0f;
     fStep = 0.1f;
 
     InvalidateRect(m_hwnd, NULL, FALSE);
