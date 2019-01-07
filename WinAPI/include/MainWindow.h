@@ -19,6 +19,8 @@ class MainWindow : public BaseWindow<MainWindow>
     ID2D1HwndRenderTarget   *pRenderTarget;
     ID2D1SolidColorBrush    *pBrushEllipse;
     ID2D1SolidColorBrush    *pBrushLine;
+    ID2D1SolidColorBrush    *pBrushText;
+    D2D1_COLOR_F            colorLine = D2D1::ColorF(0xB40000);
     D2D1_ELLIPSE            ellipse;
 
     const D2D1_RECT_F rcText = D2D1::RectF(10.0f, 10.0f, 1000.0f, 1000.0f);
@@ -51,7 +53,7 @@ class MainWindow : public BaseWindow<MainWindow>
 
 public:
 
-    MainWindow() : pFactory(NULL), pRenderTarget(NULL), pBrushEllipse(NULL), pBrushLine(NULL), pWriteFactory(NULL), pWriteTextFormat(NULL)
+    MainWindow() : pFactory(NULL), pRenderTarget(NULL), pBrushEllipse(NULL), pBrushLine(NULL), pBrushText(NULL), pWriteFactory(NULL), pWriteTextFormat(NULL)
     {
     }
 

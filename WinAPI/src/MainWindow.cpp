@@ -36,23 +36,28 @@ HRESULT MainWindow::CreateGraphicsResources()
 
             if (SUCCEEDED(hr))
             {
-                const D2D1_COLOR_F colorLine = D2D1::ColorF(0.0f, 0.0f, 0.0f);
-                hr = pRenderTarget->CreateSolidColorBrush(colorLine, &pBrushLine);
+                const D2D1_COLOR_F colorText = D2D1::ColorF(0.0f, 0.0f, 0.0f);
+                hr = pRenderTarget->CreateSolidColorBrush(colorText, &pBrushText);
 
                 if (SUCCEEDED(hr))
                 {
-                    pWriteFactory->CreateTextFormat(
-                        L"Arial",
-                        NULL,
-                        DWRITE_FONT_WEIGHT_NORMAL,
-                        DWRITE_FONT_STYLE_NORMAL,
-                        DWRITE_FONT_STRETCH_NORMAL,
-                        24.0f * 96.0f / 72.0f,
-                        L"en-EN",
-                        &pWriteTextFormat);
+                    hr = pRenderTarget->CreateSolidColorBrush(colorLine, &pBrushLine);
 
                     if (SUCCEEDED(hr))
-                        CalculateLayout();
+                    {
+                        hr = pWriteFactory->CreateTextFormat(
+                            L"Arial",
+                            NULL,
+                            DWRITE_FONT_WEIGHT_NORMAL,
+                            DWRITE_FONT_STYLE_NORMAL,
+                            DWRITE_FONT_STRETCH_NORMAL,
+                            24.0f * 96.0f / 72.0f,
+                            L"en-EN",
+                            &pWriteTextFormat);
+
+                        if (SUCCEEDED(hr))
+                            CalculateLayout();
+                    }
                 }
             }
         }
@@ -65,6 +70,7 @@ void MainWindow::DiscardGraphicsResources()
     SafeRelease(&pRenderTarget);
     SafeRelease(&pBrushEllipse);
     SafeRelease(&pBrushLine);
+    SafeRelease(&pBrushText);
     SafeRelease(&pFactory);
     SafeRelease(&pWriteFactory);
     SafeRelease(&pWriteTextFormat);
@@ -90,11 +96,28 @@ void MainWindow::OnPaint()
 
         mbstowcs_s(NULL, text, 13, buff, 13);
 
-        pRenderTarget->DrawTextW(text, (UINT32)wcslen(text), pWriteTextFormat, rcText, pBrushLine);
+        pRenderTarget->DrawTextW(text, (UINT32)wcslen(text), pWriteTextFormat, rcText, pBrushText);
+
+        colorLine = D2D1::ColorF(0xB40000);
 
         if (useFloat == FALSE)
             for (size_t i = 0; i < 360; i++)
             {
+                if (i < 60)
+                    colorLine.g += 3.0f / 255.0f;
+                else if (i < 120)
+                    colorLine.r -= 3.0f / 255.0f;
+                else if (i < 180)
+                    colorLine.b += 3.0f / 255.0f;
+                else if (i < 240)
+                    colorLine.g -= 3.0f / 255.0f;
+                else if (i < 300)
+                    colorLine.r += 3.0f / 255.0f;
+                else
+                    colorLine.b -= 3.0f / 255.0f;
+
+                pBrushLine->SetColor(colorLine);
+
                 pRenderTarget->DrawLine(
                     D2D1::Point2F(
                         ellipse.radiusX * cosf(i * (float)M_PI / 180.0f) + ellipse.point.x,
@@ -107,6 +130,21 @@ void MainWindow::OnPaint()
         else
             for (size_t i = 0; i < 360; i++)
             {
+                if (i < 60)
+                    colorLine.g += 3.0f / 255.0f;
+                else if (i < 120)
+                    colorLine.r -= 3.0f / 255.0f;
+                else if (i < 180)
+                    colorLine.b += 3.0f / 255.0f;
+                else if (i < 240)
+                    colorLine.g -= 3.0f / 255.0f;
+                else if (i < 300)
+                    colorLine.r += 3.0f / 255.0f;
+                else
+                    colorLine.b -= 3.0f / 255.0f;
+
+                pBrushLine->SetColor(colorLine);
+
                 pRenderTarget->DrawLine(
                     D2D1::Point2F(
                         ellipse.radiusX * cosf(i * (float)M_PI / 180.0f) + ellipse.point.x,
@@ -172,26 +210,21 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
         switch (wParam)
         {
         case VK_UP:
-            Increment();
+            if (isAutomated == FALSE)
+                Increment();
             return 0;
 
         case VK_DOWN:
-            Decrement();
+            if (isAutomated == FALSE)
+                Decrement();
             return 0;
 
         case 0x41:      // A
-            t = std::thread(&MainWindow::Automate, this);
-            t.detach();
-            return 0;
-
-        case 0x47:      // G - for Golden number.
-            fMultiplier = (1 + sqrtf(5.0f)) / 2.0f;
-            multiplier = (size_t)((1 + sqrtf(5.0f)) / 2.0f * 100);
-            useFloat = TRUE;
-            OnPaint();
-            //InvalidateRect(m_hwnd, NULL, FALSE);        //////////////////////// WHY DOES IT WORK!!!!!!??????????????????????????????????
-            useFloat = FALSE;
-            fMultiplier = 0.0f;
+            if (isAutomated == FALSE)
+            {
+                t = std::thread(&MainWindow::Automate, this);
+                t.detach();
+            }
             return 0;
 
         case 0x52:      // R
@@ -202,6 +235,7 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
             if (GetKeyState(VK_LCONTROL) & 0x8000)
             {
                 isAutomated = FALSE;
+                Sleep(25);
                 DiscardGraphicsResources();
                 PostQuitMessage(0);
                 return 0;
