@@ -1,7 +1,6 @@
 #ifndef _MAINWINDOW_H_
 #define _MAINWINDOW_H_
 
-#include "objs.h"
 #include "basewin.h"
 
 template <class T> void SafeRelease(T **ppT)
@@ -34,6 +33,7 @@ class MainWindow : public BaseWindow<MainWindow>
     size_t  step = 1;
     float   fMultiplier = 0.0f;
     float   fStep = 0.1f;
+    BOOL    usingArrowKeys = FALSE;
     BOOL    isAutomated = FALSE;
     BOOL    mtResize = FALSE;
     BOOL    useFloat = FALSE;

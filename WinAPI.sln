@@ -6,9 +6,6 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Objs", "Objs\Objs.vcxproj", "{14EDA47A-AE40-4D5E-B102-785C6BBED579}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WinAPI", "WinAPI\WinAPI.vcxproj", "{37B94969-8C70-446B-874E-E51A178FE85E}"
-	ProjectSection(ProjectDependencies) = postProject
-		{14EDA47A-AE40-4D5E-B102-785C6BBED579} = {14EDA47A-AE40-4D5E-B102-785C6BBED579}
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

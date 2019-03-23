@@ -206,17 +206,50 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
             mtResize = TRUE;
         return isAutomated;
 
+    case WM_KEYUP:
+        switch (wParam)
+        {
+        case VK_UP:
+            usingArrowKeys = FALSE;
+            return 0;
+
+        case VK_DOWN:
+            usingArrowKeys = FALSE;
+            return 0;
+
+        default:
+            break;
+        }
+
     case WM_KEYDOWN:
         switch (wParam)
         {
         case VK_UP:
-            if (isAutomated == FALSE)
-                Increment();
+            if (isAutomated == FALSE && usingArrowKeys == FALSE)
+            {
+                t = std::thread(&MainWindow::Increment, this);
+                t.detach();
+            }
             return 0;
 
         case VK_DOWN:
-            if (isAutomated == FALSE)
-                Decrement();
+            if (isAutomated == FALSE && usingArrowKeys == FALSE)
+            {
+                t = std::thread(&MainWindow::Decrement, this);
+                t.detach();
+            }
+            return 0;
+
+        case VK_ESCAPE:
+            isAutomated = FALSE;
+            Sleep(25);
+            DiscardGraphicsResources();
+            PostQuitMessage(0);
+            return 0;
+
+        case 0x30:      // 0
+        case VK_NUMPAD0:
+            Reset();
             return 0;
 
         case 0x41:      // A
@@ -227,8 +260,13 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
             }
             return 0;
 
-        case 0x52:      // R
-            Reset();
+        case 0x52:      // R - random
+            if (isAutomated == FALSE)
+            {
+                multiplier = 5000 - std::rand() % 5001;
+                OnPaint();
+                InvalidateRect(m_hwnd, NULL, FALSE);
+            }
             return 0;
 
         case 0x57:      // W - intended to use with CTRL to close the window.
@@ -250,16 +288,28 @@ LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 void MainWindow::Increment()
 {
-    multiplier = (multiplier >= 5000) ? 0 : multiplier + step;
-    //OnPaint();        //////////////////////// WHY DOES IT WORK!!!!!!??????????????????????????????????
-    InvalidateRect(m_hwnd, NULL, FALSE);
+    usingArrowKeys = TRUE;
+
+    while (usingArrowKeys)
+    {
+        multiplier = (multiplier >= 5000) ? 0 : multiplier + step;
+        //OnPaint();        //////////////////////// WHY DOES IT WORK!!!!!!??????????????????????????????????
+        InvalidateRect(m_hwnd, NULL, FALSE);
+        Sleep(16);
+    }
 }
 
 void MainWindow::Decrement()
 {
-    multiplier = (multiplier < 1) ? 5000 : multiplier - step;
-    //OnPaint();        //////////////////////// WHY DOES IT WORK!!!!!!??????????????????????????????????
-    InvalidateRect(m_hwnd, NULL, FALSE);
+    usingArrowKeys = TRUE;
+
+    while (usingArrowKeys)
+    {
+        multiplier = (multiplier < 1) ? 5000 : multiplier - step;
+        //OnPaint();        //////////////////////// WHY DOES IT WORK!!!!!!??????????????????????????????????
+        InvalidateRect(m_hwnd, NULL, FALSE);
+        Sleep(16);
+    }
 }
 
 void MainWindow::Reset()
@@ -324,6 +374,8 @@ void MainWindow::Automate()
 
 int MainWindow::OnCreate()
 {
+    std::srand((unsigned int)std::time(nullptr));
+
     if (FAILED(D2D1CreateFactory(D2D1_FACTORY_TYPE_MULTI_THREADED, &pFactory)))
         return -1;
 
