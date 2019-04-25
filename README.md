@@ -5,4 +5,4 @@ I decided to upload this to GitHub because something was broken, and I changed s
 
 
 # Objs
-I was trying to implement (yeah, it's horrible) Windows Controls to a library, to programmatically control the controls, and not just use resource scripts.
+I was trying to implement (yeah, it's horrible) Windows Controls to a library, to programmatically control the controls, and not just use resource scripts (which I don't know how to use, I'll probbably end up using that).
