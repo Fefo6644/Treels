@@ -10,14 +10,17 @@
 #include <ShObjIdl.h>
 #include <Uxtheme.h>
 #pragma comment(lib, "Uxtheme.lib")
-#include <d2d1.h>
+#include <d2d1_3.h>
 #pragma comment(lib, "d2d1.lib")
-#include <dwrite.h>
-#pragma comment(lib, "dwrite.lib")
 
 // C++ STL header files
 #define _USE_MATH_DEFINES
-#include <thread>
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
+#include <exception>
+#include <system_error>
+#include <thread>
+#include <atomic>
+#include <condition_variable>
+#include <mutex>

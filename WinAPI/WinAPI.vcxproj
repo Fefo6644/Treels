@@ -157,6 +157,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Controls.cpp" />
+    <ClCompile Include="src\Grapher.cpp" />
     <ClCompile Include="src\MainWindow.cpp" />
     <ClCompile Include="src\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -167,6 +169,8 @@
     <ClCompile Include="src\WinAPI.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Controls.h" />
+    <ClInclude Include="include\Grapher.h" />
     <ClInclude Include="include\basewin.h" />
     <ClInclude Include="include\MainWindow.h" />
     <ClInclude Include="include\pch.h" />
