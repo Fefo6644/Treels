@@ -171,7 +171,6 @@
   <ItemGroup>
     <ClInclude Include="include\Controls.h" />
     <ClInclude Include="include\Grapher.h" />
-    <ClInclude Include="include\basewin.h" />
     <ClInclude Include="include\MainWindow.h" />
     <ClInclude Include="include\pch.h" />
   </ItemGroup>

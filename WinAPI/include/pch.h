@@ -4,6 +4,9 @@
 #define UNICODE
 #endif // UNICODE
 
+typedef unsigned char byte;
+typedef unsigned short word;
+
 // Windows header files
 #include <Windows.h>
 #include <windowsx.h>

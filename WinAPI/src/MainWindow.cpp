@@ -6,70 +6,13 @@
 
 namespace proj {
 
-	HRESULT MainWindow::CreateGraphicsResources() {
-		HRESULT hr = S_OK;
-		if (pRenderTarget == NULL) {
-			RECT rc;
-			GetClientRect(m_hwnd, &rc);
-
-			D2D1_SIZE_U size = D2D1::SizeU(rc.right, rc.bottom);
-
-			hr = pFactory->CreateHwndRenderTarget(
-				D2D1::RenderTargetProperties(),
-				D2D1::HwndRenderTargetProperties(m_hwnd, size),
-				&pRenderTarget);
-
-			if (SUCCEEDED(hr)) {
-				// Call grapher. Send vertices.
-			}
-		}
-		return hr;
-	}
-
-	void MainWindow::DiscardGraphicsResources() {
-		SafeRelease(&pRenderTarget);
-		SafeRelease(&pFactory);
-	}
-
-	void MainWindow::OnPaint() {
-		painting = TRUE;
-
-		HRESULT hr = CreateGraphicsResources();
-		if (SUCCEEDED(hr)) {
-			PAINTSTRUCT ps;
-			BeginPaint(m_hwnd, &ps);
-
-			pRenderTarget->BeginDraw();
-
-			pRenderTarget->Clear(D2D1::ColorF(0x000000));
-
-			hr = pRenderTarget->EndDraw();
-			if (FAILED(hr) || hr == D2DERR_RECREATE_TARGET)
-				DiscardGraphicsResources();
-
-			EndPaint(m_hwnd, &ps);
-		}
-
-		painting = FALSE;
-	}
-
-	void MainWindow::Resize() {
-		if (pRenderTarget != NULL) {
-			RECT rc;
-			GetClientRect(m_hwnd, &rc);
-
-			D2D1_SIZE_U size = D2D1::SizeU(rc.right, rc.bottom);
-
-			pRenderTarget->Resize(size);
-			// Call grapher. Send vertices.
-			InvalidateRect(m_hwnd, NULL, FALSE);
-		}
-	}
-
-	LRESULT MainWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	LRESULT CALLBACK MainWindow::WindowProc(HWND hwnd, unsigned int uMsg, WPARAM wParam, LPARAM lParam) {
 		if (closing == 1) {
 			closing = 2;
-			DiscardGraphicsResources();
+
+			controlsHandler.~Controls();
+			renderer.~Grapher();
+
 			PostQuitMessage(0);
 			return 0;
 		}
@@ -77,9 +20,18 @@ namespace proj {
 		switch (uMsg) {
 
 		case WM_SETCURSOR:
-			if (hasLoaded == TRUE) {
-				SetCursor(niceArrow);
-				return TRUE;
+			if (hasWindowLoaded == true) {
+				RECT clientArea;
+				GetClientRect(hwnd, &clientArea);
+
+				POINT cursorPos;
+				GetCursorPos(&cursorPos);
+				ScreenToClient(hwnd, &cursorPos);
+
+				if (cursorPos.x < clientArea.right && cursorPos.x > 0 && cursorPos.y < clientArea.bottom && cursorPos.y > 0) {
+					SetCursor(niceArrow);
+					return true;
+				}
 			}
 			break;
 
@@ -87,47 +39,77 @@ namespace proj {
 			return OnCreate();
 
 		case WM_DESTROY:
-			DiscardGraphicsResources();
+			controlsHandler.~Controls();
+			renderer.~Grapher();
+
 			PostQuitMessage(0);
 			return 0;
 
 		case WM_PAINT:
-			OnPaint();
-			hasLoaded = TRUE;
+			renderer.DrawVertices(nullptr);
+
+			hasWindowLoaded = true;
 			return 0;
 
 		case WM_SIZE:
-			Resize();
+			renderer.Resize();
 			return 0;
 
 		case WM_KEYDOWN:
 			isKeyBeingPressedOrReleased = PRESSED;
 		case WM_KEYUP:
-			Controls::ParseKeyEvent(wParam, isKeyBeingPressedOrReleased);
+			controlsHandler.ParseKeyEvent(wParam, isKeyBeingPressedOrReleased);
 			isKeyBeingPressedOrReleased = RELEASED;
 			break;
 		}
 
-		return DefWindowProc(m_hwnd, uMsg, wParam, lParam);
+		return DefWindowProc(hwnd, uMsg, wParam, lParam);
 	}
 
 	int MainWindow::OnCreate() {
 		std::srand((unsigned int)std::time(nullptr));
 
-		if (FAILED(D2D1CreateFactory(D2D1_FACTORY_TYPE_MULTI_THREADED, &pFactory)))
-			return -1;
+		renderer.Init();
 
-		if (Controls::ControlsMain(&m_hwnd, &closing) == 0)
+		if (controlsHandler.ControlsMain(&m_hwnd, &closing) == 0)
 			return -1;
 
 		niceArrow = (HCURSOR)LoadImage(NULL, L"C:\\Windows\\Cursors\\aero_arrow.cur", IMAGE_CURSOR, NULL, NULL, LR_LOADFROMFILE | LR_DEFAULTSIZE);
-		resizeTopBot = (HCURSOR)LoadImage(NULL, L"C:\\Windows\\Cursors\\aero_ns.cur", IMAGE_CURSOR, NULL, NULL, LR_LOADFROMFILE | LR_DEFAULTSIZE);
-		resizeLeftRight = (HCURSOR)LoadImage(NULL, L"C:\\Windows\\Cursors\\aero_ew.cur", IMAGE_CURSOR, NULL, NULL, LR_LOADFROMFILE | LR_DEFAULTSIZE);
-		resizeCornerNESW = (HCURSOR)LoadImage(NULL, L"C:\\Windows\\Cursors\\aero_nesw.cur", IMAGE_CURSOR, NULL, NULL, LR_LOADFROMFILE | LR_DEFAULTSIZE);
-		resizeCornerNWSE = (HCURSOR)LoadImage(NULL, L"C:\\Windows\\Cursors\\aero_nwse.cur", IMAGE_CURSOR, NULL, NULL, LR_LOADFROMFILE | LR_DEFAULTSIZE);
-
 
 		return 0;
 	}
 
+	bool MainWindow::CreateWnd(const wchar_t* lpWindowName, DWORD dwStyle, HINSTANCE hInstance, int x, int y, int nWidth, int nHeight, HWND hWndParent, HMENU hMenu) {
+
+		RECT desiredClientArea = { x, y, nWidth, nHeight };
+		AdjustWindowRect(&desiredClientArea, WS_OVERLAPPEDWINDOW, false);
+
+		WNDCLASS wc = { 0 };
+
+		wc.lpfnWndProc = MainWindow::WindowProc;
+		wc.hInstance = hInstance;
+		wc.lpszClassName = L"MainWindow";
+
+		RegisterClass(&wc);
+
+		m_hwnd = CreateWindow(
+			L"MainWindow", lpWindowName, dwStyle, 0, 0, desiredClientArea.right, desiredClientArea.bottom, hWndParent, hMenu, hInstance, this
+		);
+
+		return (m_hwnd ? true : false);
+	}
+
+	HWND MainWindow::Window() {
+		return m_hwnd;
+	}
+
+	HWND MainWindow::m_hwnd = nullptr;
+
+	Grapher MainWindow::renderer = Grapher(&m_hwnd);
+	Controls MainWindow::controlsHandler = Controls();
+
+	std::atomic<unsigned int> MainWindow::closing = 0;
+	bool MainWindow::hasWindowLoaded = false;
+	bool MainWindow::isKeyBeingPressedOrReleased = false;
+	HCURSOR MainWindow::niceArrow = nullptr;
 }

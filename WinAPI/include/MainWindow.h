@@ -1,43 +1,36 @@
 #ifndef _MAINWINDOW_H_
 #define _MAINWINDOW_H_
 
-#include "basewin.h"
-
 namespace proj {
 
-	template <class T> void SafeRelease(T** ppT) {
-		if (*ppT) {
-			(*ppT)->Release();
-			*ppT = NULL;
-		}
-	}
+	class MainWindow {
+	private:
+		static HWND m_hwnd;
 
-	class MainWindow : public BaseWindow<MainWindow> {
-		ID2D1Factory7* pFactory;
-		ID2D1HwndRenderTarget* pRenderTarget;
+		static Grapher renderer;
+		static Controls controlsHandler;
 
-		std::atomic<BOOL>	painting = FALSE;
-		std::atomic<UINT>	closing = 0;
-		BOOL	hasLoaded = FALSE;
-		BOOL	isKeyBeingPressedOrReleased = FALSE;
-		HCURSOR niceArrow = nullptr;
-		HCURSOR resizeTopBot = nullptr;
-		HCURSOR resizeLeftRight = nullptr;
-		HCURSOR resizeCornerNESW = nullptr;
-		HCURSOR resizeCornerNWSE = nullptr;
+		static std::atomic<unsigned int> closing;
+		static bool hasWindowLoaded;
+		static bool isKeyBeingPressedOrReleased;
+		static HCURSOR niceArrow;
 
-		HRESULT	CreateGraphicsResources();
-		void	DiscardGraphicsResources();
-		void	OnPaint();
-		void	Resize();
-		int		OnCreate();
+		static int OnCreate();
 
 	public:
+		static HWND Window();
 
-		MainWindow() : pFactory(NULL), pRenderTarget(NULL) {}
+		bool CreateWnd(const wchar_t* lpWindowName,
+			DWORD dwStyle,
+			HINSTANCE hInstance = GetModuleHandle(NULL),
+			int x = 0,
+			int y = 0,
+			int nWidth = 400,
+			int nHeight = 400,
+			HWND hWndParent = 0,
+			HMENU hMenu = 0);
 
-		PCWSTR	ClassName() const { return L"Window Class"; }
-		LRESULT	HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
+		static LRESULT CALLBACK WindowProc(HWND hwnd, unsigned int uMsg, WPARAM wParam, LPARAM lParam);
 	};
 
 }

@@ -3,31 +3,32 @@
 
 namespace proj {
 
-	constexpr BOOL PRESSED = TRUE;
-	constexpr BOOL RELEASED = FALSE;
+	constexpr bool PRESSED = true;
+	constexpr bool RELEASED = false;
 
-	constexpr WORD KEY_CLOSE_DOWN = 0b1000000000000000;
+	constexpr word KEY_CLOSE_DOWN = 0b1000000000000000;
 
-	constexpr WORD KEY_CLOSE_UP = 0b0111111111111111;
+	constexpr word KEY_CLOSE_UP = 0b0111111111111111;
 
 	class Controls {
 
 	public:
-		static int ControlsMain(HWND* hWnd, std::atomic<UINT>* closing);
-		static void ParseKeyEvent(WPARAM keyEvent, BOOL isKeyBeingPressedOrReleased);
+
+		int ControlsMain(HWND* hWnd, std::atomic<unsigned int>* closing);
+		void ParseKeyEvent(WPARAM keyEvent, bool isKeyBeingPressedOrReleased);
 
 	private:
-		static std::atomic<WORD> keysState;
-		static std::atomic<BOOL> checkingControls;
-		static std::atomic<UINT>* closing;
+		std::atomic<word> keysState = 0b0000000000000000;
+		std::atomic<bool> checkingControls = false;
+		std::atomic<unsigned int>* closing = nullptr;
 
-		static std::condition_variable keysStateChanged;
-		static std::mutex m;
+		std::condition_variable keysStateChanged = std::condition_variable();
+		std::mutex m = std::mutex();
 
-		static HWND* hWnd;
+		HWND* hWnd = nullptr;
 
-		static std::thread _t;
-		static void _controlsMain();
+		std::thread _t = std::thread();
+		void _controlsMain();
 
 	};
 
