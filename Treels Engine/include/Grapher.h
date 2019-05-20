@@ -10,8 +10,8 @@ namespace proj {
 		~Grapher();
 
 		void Init();
-		void Resize();
-		void DrawVertices(float* vertexArray);
+		void Resize(LPARAM lParam);
+		void DrawVertices(std::atomic<float>* vertexArray);
 
 	private:
 		HWND* hWnd = nullptr;
@@ -23,6 +23,8 @@ namespace proj {
 
 		std::atomic<bool> drawing = false;
 		std::atomic<bool> mustResize = false;
+		std::atomic<LPARAM> newSize = NULL;
+		std::atomic<float>* vertices = nullptr;
 
 		std::thread _t = std::thread();
 		std::atomic<bool> isThreadActive = false;

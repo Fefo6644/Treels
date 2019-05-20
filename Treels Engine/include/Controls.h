@@ -14,7 +14,7 @@ namespace proj {
 
 	public:
 
-		int ControlsMain(HWND* hWnd, std::atomic<unsigned int>* closing);
+		int Init(HWND* hWnd, std::atomic<unsigned int>* closing);
 		void ParseKeyEvent(WPARAM keyEvent, bool isKeyBeingPressedOrReleased);
 
 	private:

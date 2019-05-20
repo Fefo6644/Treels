@@ -18,7 +18,7 @@ namespace proj {
 		checkingControls = false;
 	}
 
-	int Controls::ControlsMain(HWND* hWnd, std::atomic<unsigned int>* closing) {
+	int Controls::Init(HWND* hWnd, std::atomic<unsigned int>* closing) {
 		try {
 			if (checkingControls == false) {
 				_t = std::thread(&Controls::_controlsMain, this);

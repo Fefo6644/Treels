@@ -52,7 +52,7 @@ namespace proj {
 			return 0;
 
 		case WM_SIZE:
-			renderer.Resize();
+			renderer.Resize(lParam);
 			return 0;
 
 		case WM_KEYDOWN:
@@ -71,7 +71,7 @@ namespace proj {
 
 		renderer.Init();
 
-		if (controlsHandler.ControlsMain(&m_hwnd, &closing) == 0)
+		if (controlsHandler.Init(&m_hwnd, &closing) == 0)
 			return -1;
 
 		niceArrow = (HCURSOR)LoadImage(NULL, L"C:\\Windows\\Cursors\\aero_arrow.cur", IMAGE_CURSOR, NULL, NULL, LR_LOADFROMFILE | LR_DEFAULTSIZE);

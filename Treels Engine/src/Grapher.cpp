@@ -10,13 +10,10 @@ namespace proj {
 			if (mustResize == true) {
 				mustResize = false;
 				if (pRenderTarget != NULL) {
-					RECT rc;
-					GetClientRect(*hWnd, &rc);
-
-					D2D1_SIZE_U size = D2D1::SizeU(rc.right, rc.bottom);
+					D2D1_SIZE_U size = D2D1::SizeU(LOWORD(newSize), HIWORD(newSize));
 
 					pRenderTarget->Resize(size);
-					// Call grapher. Parse vertices or whatever.
+					// Parse vertices or whatever.
 					InvalidateRect(*hWnd, NULL, false);
 				}
 			}
@@ -28,7 +25,7 @@ namespace proj {
 
 					pRenderTarget->BeginDraw();
 
-					pRenderTarget->Clear(D2D1::ColorF(0x5e1298));
+					pRenderTarget->Clear(D2D1::ColorF(0x080808));
 
 					hr = pRenderTarget->EndDraw();
 					if (FAILED(hr) || hr == D2DERR_RECREATE_TARGET) {
@@ -57,19 +54,21 @@ namespace proj {
 				&pRenderTarget);
 
 			if (SUCCEEDED(hr)) {
-				// Call grapher. Parse vertices or whatever.
+				// Parse vertices or whatever.
 			}
 		}
 		return hr;
 	}
 
-	void Grapher::DrawVertices(float* vertexArray) {
-
+	void Grapher::DrawVertices(std::atomic<float>* vertexArray) {
+		vertices = vertexArray;
 	}
 
-	void Grapher::Resize() {
-		if (mustResize == false)
+	void Grapher::Resize(LPARAM lParam) {
+		if (mustResize == false) {
+			this->newSize = lParam;
 			mustResize = true;
+		}
 	}
 
 	Grapher::Grapher(HWND* hWnd) {
@@ -94,7 +93,7 @@ namespace proj {
 		if (drawing == false) {
 			isThreadActive = true;
 
-			if (FAILED(D2D1CreateFactory(D2D1_FACTORY_TYPE_MULTI_THREADED, &pFactory)))
+			if (FAILED(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &pFactory)))
 				FatalAppExit(0, L"An error ocurred trying to initialize the graphics thread.\r\nProgram will shut down.");
 
 			_t = std::thread(&Grapher::_draw, this);
