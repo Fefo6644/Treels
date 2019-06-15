@@ -1,14 +1,16 @@
 #ifndef _CONTROLS_H_
 #define _CONTROLS_H_
 
-namespace proj {
+namespace ctrls {
 
 	constexpr bool PRESSED = true;
 	constexpr bool RELEASED = false;
 
 	constexpr word KEY_CLOSE_DOWN = 0b1000000000000000;
+	constexpr word KEY_RESET_DOWN = 0b0000000000000001;
 
 	constexpr word KEY_CLOSE_UP = 0b0111111111111111;
+	constexpr word KEY_RESET_UP = 0b1111111111111110;
 
 	class Controls {
 
@@ -34,4 +36,4 @@ namespace proj {
 
 }
 
-#endif
+#endif // !_CONTROLS_H_

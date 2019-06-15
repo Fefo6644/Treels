@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _PRECOMPILED_HEADER_
+#define _PRECOMPILED_HEADER_
 
 #ifndef UNICODE
 #define UNICODE
@@ -6,24 +7,28 @@
 
 typedef unsigned char byte;
 typedef unsigned short word;
+typedef unsigned int dword;
+typedef unsigned long qword;
 
 // Windows header files
 #include <Windows.h>
-#include <windowsx.h>
-#include <ShObjIdl.h>
-#include <Uxtheme.h>
-#pragma comment(lib, "Uxtheme.lib")
 #include <d2d1_3.h>
-#pragma comment(lib, "d2d1.lib")
 
 // C++ STL header files
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
+#include <chrono>
 #include <exception>
 #include <system_error>
+#include <vector>
+#include <sstream>
+#include <string>
+#include <iomanip>
 #include <thread>
 #include <atomic>
 #include <condition_variable>
 #include <mutex>
+
+#endif // !_PRECOMPILED_HEADER_

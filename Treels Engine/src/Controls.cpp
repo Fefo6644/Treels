@@ -2,7 +2,7 @@
 
 #include "Controls.h"
 
-namespace proj {
+namespace ctrls {
 
 	void Controls::_controlsMain() {
 		checkingControls = true;
@@ -31,9 +31,7 @@ namespace proj {
 				return 2;
 		}
 		catch (const std::system_error * se) {
-			MessageBox(*hWnd, L"An error has ocurred.\r\n\
-Controls could not be initialized.\r\n\
-Program will shut down.", L"System Error", MB_OK);
+			MessageBox(*hWnd, L"An error has ocurred. Controls could not be initialized. Program will shut down.", L"System Error", MB_OK);
 
 			wchar_t* seWhat = new wchar_t[strlen(se->what()) + 1], *seCode = new wchar_t[strlen(se->code().message().c_str()) + 1];
 			mbstowcs_s(NULL, seWhat, strlen(se->what()) + 1, se->what(), strlen(se->what()));
