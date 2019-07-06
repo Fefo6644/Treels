@@ -5,14 +5,16 @@
 #define UNICODE
 #endif // UNICODE
 
-typedef unsigned char byte;
-typedef unsigned short word;
-typedef unsigned int dword;
-typedef unsigned long qword;
+using byte = unsigned char;
+using word = unsigned short;
+using dword = unsigned int;
+using qword = unsigned long long;
 
 // Windows header files
 #include <Windows.h>
+#include <windowsx.h>
 #include <d2d1_3.h>
+#include <objbase.h>
 
 // C++ STL header files
 #define _USE_MATH_DEFINES
@@ -20,15 +22,12 @@ typedef unsigned long qword;
 #include <cstdlib>
 #include <ctime>
 #include <chrono>
-#include <exception>
-#include <system_error>
 #include <vector>
 #include <sstream>
 #include <string>
 #include <iomanip>
 #include <thread>
 #include <atomic>
-#include <condition_variable>
-#include <mutex>
+#include <functional>
 
 #endif // !_PRECOMPILED_HEADER_

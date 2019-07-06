@@ -2,105 +2,46 @@
 #define _OBJECTS_H_
 
 namespace objs {
-
 	typedef struct Color {
-	public:
-		Color(float r = 1.0f, float g = 1.0f, float b = 1.0f, float a = 1.0f);
+		Color(float r, float g, float b, float a);
 
-		float GetR(void) const;
-		float GetG(void) const;
-		float GetB(void) const;
-		float GetA(void) const;
-
-		D2D1_COLOR_F GetD2D1Color(void) const;
-
-		void SetR(float r);
-		void SetG(float g);
-		void SetB(float b);
-		void SetA(float a);
-
-	private:
-		D2D1_COLOR_F color;
-		float _r;
-		float _g;
-		float _b;
-		float _a;
+		D2D1_COLOR_F color = D2D1::ColorF(0.0f, 0.0f, 0.0f, 1.0f);
 	} Color;
 
 	typedef struct Point {
-	public:
-		Point(float x = 0.0f, float y = 0.0f);
+		Point(float x, float y);
 
-		float GetX(void) const;
-		float GetY(void) const;
-
-		D2D1_POINT_2F GetD2D1Point(void) const;
-
-		void SetX(float x);
-		void SetY(float y);
-
-	private:
-		D2D1_POINT_2F point;
-		float _x;
-		float _y;
+		D2D1_POINT_2F point = D2D1::Point2F(0.0f, 0.0f);
 	} Point;
 
 	typedef struct Circle {
-	public:
-		Circle(Color colorFill = Color(), Color colorOutline = Color(), Point center = Point(), float radius = 10.0f);
+		Circle(Color colorFill = Color(0.0f, 0.0f, 0.0f, 1.0f), Color colorOutline = Color(0.0f, 0.0f, 0.0f, 1.0f), Point center = Point(0.0f, 0.0f), float radius = 10.0f, short zOrder = 0);
 
-		bool drawFill;
-		bool drawOutline;
-		Color colorFill;
-		Color colorOutline;
-
-		float GetRadius(void) const;
-		Point GetCenter(void) const;
-
-		D2D1_ELLIPSE GetD2D1Ellipse(void) const;
-
-		void SetRadius(float radius);
-		void SetCenter(Point center);
-
-	private:
-		D2D1_ELLIPSE circle;
-		Point _center;
-		float _radius;
+		bool drawFill = true;
+		bool drawOutline = true;
+		Color colorFill = Color(1.0f, 1.0f, 1.0f, 1.0f);
+		Color colorOutline = Color(0.0f, 0.0f, 0.0f, 1.0f);
+		D2D1_ELLIPSE circle = D2D1::Ellipse(D2D1::Point2F(), 10.0f, 10.0f);
 	} Circle;
 
 	typedef struct Rectangle {
-	public:
-		Rectangle(Color colorFill = Color(), Color colorOutline = Color(), Point fromCorner = Point(), Point toCorner = Point());
+		Rectangle(Color colorFill = Color(0.0f, 0.0f, 0.0f, 1.0f), Color colorOutline = Color(0.0f, 0.0f, 0.0f, 1.0f), Point fromCorner = Point(0.0f, 0.0f), Point toCorner = Point(0.0f, 0.0f), short zOrder = 0);
 
-		bool drawFill;
-		bool drawOutline;
-		Color colorFill;
-		Color colorOutline;
-
-		Point GetFromCorner(void) const;
-		Point GetToCorner(void) const;
-
-		D2D1_RECT_F GetD2D1Rect(void) const;
-
-		void SetFromCorner(Point fromCorner);
-		void SetToCorner(Point toCorner);
-
-	private:
-		D2D1_RECT_F rectangle;
-		Point _fromCorner;
-		Point _toCorner;
+		bool drawFill = true;
+		bool drawOutline = true;
+		Color colorFill = Color(1.0f, 1.0f, 1.0f, 1.0f);
+		Color colorOutline = Color(0.0f, 0.0f, 0.0f, 1.0f);
+		D2D1_RECT_F rectangle = D2D1::RectF();
 	} Rectangle;
 
 	typedef struct Line {
-	public:
-		Line(Color color = Color(), Point from = Point(), Point to = Point());
+		Line(Color color = Color(0.0f, 0.0f, 0.0f, 1.0f), Point from = Point(0.0f, 0.0f), Point to = Point(0.0f, 0.0f), short zOrder = 0);
 
-		bool draw;
-		Color color;
-		Point from;
-		Point to;
+		bool draw = true;
+		Color color = Color(0.0f, 0.0f, 0.0f, 1.0f);
+		Point from = Point(0.0f, 0.0f);
+		Point to = Point(0.0f, 0.0f);
 	} Line;
-
 }
 
 #endif // !_OBJECTS_H_
