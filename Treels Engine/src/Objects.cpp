@@ -3,6 +3,15 @@
 #include "Objects.h"
 
 namespace objs {
+	/*---------------- OBJECT ----------------*/
+
+	Object::Object() {
+		if (FAILED(CoCreateGuid(&_guid))) {
+			MessageBox(NULL, L"Failed to create object GUID. Program will shut down.", L"Fatal Error", MB_OK | MB_ICONERROR);
+			std::exit(-1);
+		}
+	}
+
 	/*---------------- COLOR ----------------*/
 
 	Color::Color(float r, float g, float b, float a) {
@@ -27,6 +36,8 @@ namespace objs {
 		this->colorFill = colorFill;
 		this->colorOutline = colorOutline;
 		drawFill = drawOutline = true;
+		this->zOrder = zOrder;
+		type = Type::ECircle;
 	}
 
 	/*---------------- RECTANGLE ----------------*/
@@ -39,6 +50,8 @@ namespace objs {
 		this->colorFill = colorFill;
 		this->colorOutline = colorOutline;
 		drawFill = drawOutline = true;
+		this->zOrder = zOrder;
+		type = Type::ERectangle;
 	}
 
 	/*---------------- LINE ----------------*/
@@ -48,5 +61,7 @@ namespace objs {
 		this->color = color;
 		this->from = from;
 		this->to = to;
+		this->zOrder = zOrder;
+		type = Type::ELine;
 	}
 }

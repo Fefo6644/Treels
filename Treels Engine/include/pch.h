@@ -29,5 +29,6 @@ using qword = unsigned long long;
 #include <thread>
 #include <atomic>
 #include <functional>
+#include <algorithm>
 
 #endif // !_PRECOMPILED_HEADER_

@@ -35,6 +35,7 @@ void AppSetup(TreelsMainWindow* applicationWindow) {
 	ball.drawOutline = true;
 	ball.circle.radiusX = ball.circle.radiusY = windowWidth < windowHeight ? windowWidth : windowHeight;
 	ball.circle.point = center.point;
+	ball.zOrder = INT16_MAX;
 
 	pBalls.push_back(&ball);
 
@@ -78,6 +79,7 @@ void AppSetup(TreelsMainWindow* applicationWindow) {
 			lineColor.color.b = 1.0f - (i - 300) / 59.0f;
 		}
 
+		lineTemp.zOrder = (short)i;
 		lineTemp.color = lineColor;
 		lineTemp.from.point.x = lineTemp.to.point.x = x;
 		lineTemp.from.point.y = lineTemp.to.point.y = y;
@@ -88,6 +90,7 @@ void AppSetup(TreelsMainWindow* applicationWindow) {
 
 	treelsWindow->LoadCircles(&pBalls);
 	treelsWindow->LoadLines(&pLines);
+	treelsWindow->Refresh();
 }
 
 void AppLoop() {

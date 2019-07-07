@@ -2,6 +2,14 @@
 #define _GRAPHER_H_
 
 namespace grph {
+	struct OrderingIndex {
+		static bool Compare(const OrderingIndex& a, const OrderingIndex& b) { return a.zOrder < b.zOrder; }
+
+		short zOrder = 0;
+		objs::Object* obj = nullptr;
+		GUID objGuid = { 0 };
+	};
+
 	class Grapher {
 	public:
 		Grapher(HWND* hWnd, objs::Color backColor = objs::Color(0.0f, 0.0f, 0.0f, 1.0f));
@@ -21,7 +29,6 @@ namespace grph {
 		void Draw();
 		float GetRefreshRate();
 
-
 	private:
 		D2D1_COLOR_F bgColor;
 
@@ -36,12 +43,17 @@ namespace grph {
 
 		ID2D1Factory* pFactory;
 		ID2D1HwndRenderTarget* pRenderTarget;
-		ID2D1SolidColorBrush* pBrushOutline;
-		ID2D1SolidColorBrush* pBrushFill;
+		ID2D1SolidColorBrush* pBrush;
 
 		std::vector<objs::Circle*>* circles;
 		std::vector<objs::Rectangle*>* rectangles;
 		std::vector<objs::Line*>* lines;
+
+		std::vector<OrderingIndex> oi;
+
+		void DrawCircle(objs::Circle* circle);
+		void DrawRectangle(objs::Rectangle* rectangle);
+		void DrawLine(objs::Line* line);
 	};
 }
 
