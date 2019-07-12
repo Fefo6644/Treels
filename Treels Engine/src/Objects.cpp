@@ -2,66 +2,72 @@
 
 #include "Objects.h"
 
-namespace objs {
-	/*---------------- OBJECT ----------------*/
+namespace Treels {
+	namespace Objects {
+		/*---------------- OBJECT ----------------*/
 
-	Object::Object() {
-		if (FAILED(CoCreateGuid(&_guid))) {
-			MessageBox(NULL, L"Failed to create object GUID. Program will shut down.", L"Fatal Error", MB_OK | MB_ICONERROR);
-			std::exit(-1);
+		Object::Object(const Type t) : _guid(CreateGuid()), type(t) {}
+
+		GUID Object::CreateGuid() {
+			GUID guid = { 0 };
+			HRESULT hres = CoCreateGuid(&guid);
+			if (FAILED(hres)) {
+				::std::wstringstream err;
+				err << L"Failed to create object. Program will shut down. Error code: " << ::std::hex << hres;
+				MessageBox(NULL, err.str().c_str(), L"Fatal Error", MB_OK | MB_ICONERROR);
+				::std::exit(-1);
+			}
+			return guid;
 		}
-	}
 
-	/*---------------- COLOR ----------------*/
+		/*---------------- COLOR ----------------*/
 
-	Color::Color(float r, float g, float b, float a) {
-		color.r = r;
-		color.g = g;
-		color.b = b;
-		color.a = a;
-	}
+		Color::Color(float r, float g, float b, float a) {
+			color.r = r;
+			color.g = g;
+			color.b = b;
+			color.a = a;
+		}
 
-	/*---------------- POINT ----------------*/
+		/*---------------- POINT ----------------*/
 
-	Point::Point(float x, float y) {
-		point.x = x;
-		point.y = y;
-	}
+		Point::Point(float x, float y) {
+			point.x = x;
+			point.y = y;
+		}
 
-	/*---------------- CIRCLE ----------------*/
+		/*---------------- CIRCLE ----------------*/
 
-	Circle::Circle(Color colorFill, Color colorOutline, Point center, float radius, short zOrder) {
-		circle.point = center.point;
-		circle.radiusX = circle.radiusY = radius;
-		this->colorFill = colorFill;
-		this->colorOutline = colorOutline;
-		drawFill = drawOutline = true;
-		this->zOrder = zOrder;
-		type = Type::ECircle;
-	}
+		Circle::Circle(Color colorFill, Color colorOutline, Point center, float radius, short zOrder) : Object(Type::ECircle) {
+			circle.point = center.point;
+			circle.radiusX = circle.radiusY = radius;
+			this->colorFill = colorFill;
+			this->colorOutline = colorOutline;
+			drawFill = drawOutline = true;
+			this->zOrder = zOrder;
+		}
 
-	/*---------------- RECTANGLE ----------------*/
+		/*---------------- RECTANGLE ----------------*/
 
-	Rectangle::Rectangle(Color colorFill, Color colorOutline, Point fromCorner, Point toCorner, short zOrder) {
-		rectangle.left = fromCorner.point.x;
-		rectangle.top = fromCorner.point.y;
-		rectangle.right = toCorner.point.x;
-		rectangle.bottom = toCorner.point.y;
-		this->colorFill = colorFill;
-		this->colorOutline = colorOutline;
-		drawFill = drawOutline = true;
-		this->zOrder = zOrder;
-		type = Type::ERectangle;
-	}
+		Rectangle::Rectangle(Color colorFill, Color colorOutline, Point fromCorner, Point toCorner, short zOrder) : Object(Type::ERectangle) {
+			rectangle.left = fromCorner.point.x;
+			rectangle.top = fromCorner.point.y;
+			rectangle.right = toCorner.point.x;
+			rectangle.bottom = toCorner.point.y;
+			this->colorFill = colorFill;
+			this->colorOutline = colorOutline;
+			drawFill = drawOutline = true;
+			this->zOrder = zOrder;
+		}
 
-	/*---------------- LINE ----------------*/
+		/*---------------- LINE ----------------*/
 
-	Line::Line(Color color, Point from, Point to, short zOrder) {
-		draw = true;
-		this->color = color;
-		this->from = from;
-		this->to = to;
-		this->zOrder = zOrder;
-		type = Type::ELine;
+		Line::Line(Color color, Point from, Point to, short zOrder) : Object(Type::ELine) {
+			draw = true;
+			this->color = color;
+			this->from = from;
+			this->to = to;
+			this->zOrder = zOrder;
+		}
 	}
 }

@@ -1,4 +1,4 @@
-# Application - Objective
+# Application
 
 This project is a testing environment, not being part of the Treels library.
 

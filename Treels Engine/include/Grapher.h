@@ -1,60 +1,60 @@
 #ifndef _GRAPHER_H_
 #define _GRAPHER_H_
 
-namespace grph {
-	struct OrderingIndex {
-		static bool Compare(const OrderingIndex& a, const OrderingIndex& b) { return a.zOrder < b.zOrder; }
+namespace Treels {
+	namespace Grapher {
+		struct OrderingIndex {
+			static constexpr bool Compare(const OrderingIndex& a, const OrderingIndex& b) {
+				return a.obj->zOrder < b.obj->zOrder;
+			}
+			Objects::Object* obj = nullptr;
+			GUID objGuid = { 0 };
+		};
 
-		short zOrder = 0;
-		objs::Object* obj = nullptr;
-		GUID objGuid = { 0 };
-	};
+		class Grapher {
+		public:
+			Grapher(HWND hWnd, Objects::Color backColor = Objects::Color(0.0f, 0.0f, 0.0f, 1.0f));
+			~Grapher();
 
-	class Grapher {
-	public:
-		Grapher(HWND* hWnd, objs::Color backColor = objs::Color(0.0f, 0.0f, 0.0f, 1.0f));
-		~Grapher();
+			void Init();
+			void Resize(LPARAM lParam);
+			void SetBackgroundColor(float r, float g, float b);
+			void LoadCircles(::std::vector<Objects::Circle>* circlesArray);
+			void UnloadCircles();
+			void LoadRectangles(::std::vector<Objects::Rectangle>* rectanglesArray);
+			void UnloadRectangles();
+			void LoadLines(::std::vector<Objects::Line>* linesArray);
+			void UnloadLines();
+			void Unload();
+			void Refresh();
+			void Draw();
+			float GetRefreshRate();
 
-		void Init();
-		void Resize(LPARAM lParam);
-		void SetBackgroundColor(float r, float g, float b);
-		void LoadCircles(std::vector<objs::Circle*>* circlesArray);
-		void UnloadCircles();
-		void LoadRectangles(std::vector<objs::Rectangle*>* rectanglesArray);
-		void UnloadRectangles();
-		void LoadLines(std::vector<objs::Line*>* linesArray);
-		void UnloadLines();
-		void Unload();
-		void Refresh();
-		void Draw();
-		float GetRefreshRate();
+		private:
+			D2D1_POINT_2F center;
+			D2D1_COLOR_F bgColor;
+			RECT rc;
 
-	private:
-		D2D1_COLOR_F bgColor;
+			::std::chrono::time_point<::std::chrono::steady_clock, ::std::chrono::duration<double, ::std::milli>> start;
+			::std::chrono::duration<double, ::std::milli> timePassed;
+			::std::chrono::duration<float, ::std::milli> displayPeriod;
 
-		std::atomic<LPARAM> newSize;
-		std::atomic<bool> mustResize;
+			HWND hWnd;
 
-		std::chrono::time_point<std::chrono::steady_clock, std::chrono::duration<double, std::milli>> start;
-		std::chrono::duration<double, std::milli> timePassed;
-		std::chrono::duration<float, std::milli> displayPeriod;
+			ID2D1Factory* pFactory;
+			ID2D1HwndRenderTarget* pRenderTarget;
+			ID2D1SolidColorBrush* pBrush;
 
-		HWND* hWnd;
+			::std::vector<Objects::Circle>* circles;
+			::std::vector<Objects::Rectangle>* rectangles;
+			::std::vector<Objects::Line>* lines;
 
-		ID2D1Factory* pFactory;
-		ID2D1HwndRenderTarget* pRenderTarget;
-		ID2D1SolidColorBrush* pBrush;
+			::std::vector<OrderingIndex> oi;
 
-		std::vector<objs::Circle*>* circles;
-		std::vector<objs::Rectangle*>* rectangles;
-		std::vector<objs::Line*>* lines;
-
-		std::vector<OrderingIndex> oi;
-
-		void DrawCircle(objs::Circle* circle);
-		void DrawRectangle(objs::Rectangle* rectangle);
-		void DrawLine(objs::Line* line);
-	};
+			void DrawCircle(Objects::Circle& circle);
+			void DrawRectangle(Objects::Rectangle& rectangle);
+			void DrawLine(Objects::Line& line);
+		};
+	}
 }
-
 #endif // !_GRAPHER_H_

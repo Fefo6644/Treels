@@ -1,24 +1,5 @@
-#ifndef _TREELS_API_H_
-#define _TREELS_API_H_
-
-#ifndef UNICODE
-#define UNICODE
-#endif // !UNICODE
-
-#pragma comment(lib, "d2d1.lib")
-#pragma comment(lib, "Treels.lib")
-
-#ifndef _WIN64
-#pragma comment(linker, "/include:_wWinMain@16")
-#else
-#pragma comment(linker, "/include:wWinMain")
-#endif // !_WIN64
-
-#include <Windows.h>
-#include <d2d1_3.h>
-#include <vector>
-
-#include "Objects.h"
+#ifndef _TREELSENGINE_H_
+#define _TREELSENGINE_H_
 
 struct TreelsApplication;
 
@@ -103,6 +84,16 @@ namespace Treels {
 	};
 
 	struct TreelsEngine {
+		bool CreateWnd(const wchar_t* lpWindowName,
+			DWORD dwStyle,
+			HINSTANCE hInstance = GetModuleHandle(NULL),
+			int x = 0,
+			int y = 0,
+			int nWidth = 400,
+			int nHeight = 400,
+			HWND hWndParent = 0,
+			HMENU hMenu = 0);
+
 		void LoadCircles(::std::vector<Objects::Circle>* circlesArray);
 		void UnloadCircles();
 		void LoadRectangles(::std::vector<Objects::Rectangle>* rectanglesArray);
@@ -135,6 +126,25 @@ namespace Treels {
 		void (TreelsApplication::* Resize)(float newWidth, float newHeight) = nullptr;
 		void (TreelsApplication::* Load)() = nullptr;
 		void (TreelsApplication::* Closing)() = nullptr;
+
+		/*---------------- Other members----------------*/
+		bool hasWindowLoaded = false;
+		HCURSOR cursor = nullptr;
+		HWND _hwnd = nullptr;
+		Grapher::Grapher* renderer = nullptr;
+		TreelsApplication* app = nullptr;
+
+		void Draw();
 	};
 }
-#endif	// !_TREELS_API_H_
+LRESULT CALLBACK WindowProc(HWND hwnd, unsigned int uMsg, WPARAM wParam, LPARAM lParam);
+
+/*---------------- Application side ----------------*/
+
+struct TreelsApplication {
+	TreelsApplication(Treels::TreelsEngine*);
+	void TreelsRun();
+	static size_t GetStructSize();
+};
+
+#endif	// !_TREELSENGINE_H_

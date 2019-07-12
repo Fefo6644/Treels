@@ -103,7 +103,8 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -128,7 +129,8 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -203,7 +205,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Grapher.cpp" />
-    <ClCompile Include="src\TreelsMainWindow.cpp" />
+    <ClCompile Include="src\Treels Engine.cpp" />
     <ClCompile Include="src\Objects.cpp" />
     <ClCompile Include="src\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -214,9 +216,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Grapher.h" />
-    <ClInclude Include="include\TreelsMainWindow.h" />
+    <ClInclude Include="include\Treels Engine.h" />
     <ClInclude Include="include\Objects.h" />
     <ClInclude Include="include\pch.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
