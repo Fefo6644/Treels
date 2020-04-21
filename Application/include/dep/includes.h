@@ -1,5 +1,5 @@
-#ifndef _PRECOMPILED_HEADER_
-#define _PRECOMPILED_HEADER_
+#ifndef _INCLUDES_
+#define _INCLUDES_
 
 #ifndef UNICODE
 #define UNICODE
@@ -61,4 +61,4 @@
 #include <utility>
 #include <filesystem>
 
-#endif // !_PRECOMPILED_HEADER_
+#endif // !_INCLUDES_

@@ -2,144 +2,122 @@
 #include <cmath>
 #include <vector>
 
-#include <dep/Treels API.h>
+#include <dep/TreelsAPI.h>
 
 #include "TreelsApp.h"
 
-size_t TreelsApplication::GetStructSize() { return sizeof(TreelsApplication); }
+void TreelsApplication::setup() {
+    getWindowSize(windowWidth, windowHeight);
+    //setBackgroundColor(0.75f, 0.75f, 0.75f);
 
-TreelsApplication::TreelsApplication(Treels::TreelsEngine* applicationWindow) {
-	window = applicationWindow;
-	window->KeyPress = &TreelsApplication::KeyPress;
-	window->Resize = &TreelsApplication::Resize;
-	window->Closing = &TreelsApplication::Closing;
+    center.x = windowWidth / 2.0f;
+    center.y = windowHeight / 2.0f;
 
-	window->GetWindowSize(windowWidth, windowHeight);
-	window->SetBackgroundColor(0.75f, 0.75f, 0.75f);
+    pBalls.push_back(Treels::Objects::Circle());
+    pBalls[0].colorOutline = Treels::Objects::Color(0.0f, 0.0f, 0.0f, 1.0f);
+    pBalls[0].drawFill = false;
+    pBalls[0].drawOutline = true;
+    pBalls[0].center = center;
+    pBalls[0].radiusX = pBalls[0].radiusY = (windowWidth < windowHeight ? windowWidth : windowHeight) / 2.0f;
+    pBalls[0].zOrder = INT16_MAX;
 
-	center.point.x = windowWidth / 2.0f;
-	center.point.y = windowHeight / 2.0f;
+    for (size_t i = 0; i < 360; ++i) {
+        if (i >= 0 && i < 60)
+            lineColor = { 1.0f, i / 59.0f, 0.0f };
+        else if (i >= 60 && i < 120)
+            lineColor = { 1.0f - (i - 60) / 59.0f, 1.0f, 0.0f };
+        else if (i >= 120 && i < 180)
+            lineColor = { 0.0f, 1.0f, (i - 120) / 59.0f };
+        else if (i >= 180 && i < 240)
+            lineColor = { 0.0f, 1.0f - (i - 180) / 59.0f, 1.0f };
+        else if (i >= 240 && i < 300)
+            lineColor = { (i - 240) / 59.0f, 0.0f, 1.0f };
+        else if (i >= 300 && i < 360)
+            lineColor = { 1.0f, 0.0f, 1.0f - (i - 300) / 59.0f };
 
-	pBalls->push_back(Treels::Objects::Circle());
-	(*pBalls)[0].colorOutline = Treels::Objects::Color(0.0f, 0.0f, 0.0f, 1.0f);
-	(*pBalls)[0].drawFill = false;
-	(*pBalls)[0].drawOutline = true;
-	(*pBalls)[0].circle.point = center.point;
-	(*pBalls)[0].circle.radiusX = (*pBalls)[0].circle.radiusY = (windowWidth < windowHeight ? windowWidth : windowHeight) / 2.0f;
-	(*pBalls)[0].zOrder = INT16_MAX;
+        pLines.push_back(Treels::Objects::Line());
+        pLines[i].zOrder = (short)i;
+        pLines[i].color = lineColor;
+        pLines[i].from.x = center.x + ::std::cosf(i / 180.0f * (float)M_PI) * pBalls[0].radiusX;
+        pLines[i].from.y = center.y - ::std::sinf(i / 180.0f * (float)M_PI) * pBalls[0].radiusY;
+    }
 
-	pLines->reserve(360);
-	Treels::Objects::Line temp;
-	float x, y, rad;
-	for (size_t i = 0; i < pLines->capacity(); ++i) {
-		rad = i / 180.0f * (float)M_PI;
-		x = center.point.x + ::std::cosf(rad) * (*pBalls)[0].circle.radiusX;
-		y = center.point.y - ::std::sinf(rad) * (*pBalls)[0].circle.radiusY;
-
-		if (i >= 0 && i < 60) {
-			lineColor.color.r = 1.0f;
-			lineColor.color.g = i / 59.0f;
-			lineColor.color.b = 0.0f;
-		}
-		else if (i >= 60 && i < 120) {
-			lineColor.color.r = 1.0f - (i - 60) / 59.0f;
-			lineColor.color.g = 1.0f;
-			lineColor.color.b = 0.0f;
-		}
-		else if (i >= 120 && i < 180) {
-			lineColor.color.r = 0.0f;
-			lineColor.color.g = 1.0f;
-			lineColor.color.b = (i - 120) / 59.0f;
-		}
-		else if (i >= 180 && i < 240) {
-			lineColor.color.r = 0.0f;
-			lineColor.color.g = 1.0f - (i - 180) / 59.0f;
-			lineColor.color.b = 1.0f;
-		}
-		else if (i >= 240 && i < 300) {
-			lineColor.color.r = (i - 240) / 59.0f;
-			lineColor.color.g = 0.0f;
-			lineColor.color.b = 1.0f;
-		}
-		else if (i >= 300 && i < 360) {
-			lineColor.color.r = 1.0f;
-			lineColor.color.g = 0.0f;
-			lineColor.color.b = 1.0f - (i - 300) / 59.0f;
-		}
-
-		temp.draw = true;
-		temp.zOrder = (short)i + 1;
-		temp.color = lineColor;
-		temp.from.point.x = temp.to.point.x = x;
-		temp.from.point.y = temp.to.point.y = y;
-
-		pLines->push_back(temp);
-	}
-
-	window->LoadCircles(pBalls);
-	window->LoadLines(pLines);
-	window->Refresh();
+    //loadCircles(&pBalls);
+    //loadLines(&pLines);
+    //refresh();
 }
 
-void TreelsApplication::TreelsRun() {
-	if (reset)
-		multiplier = 0.0f;
-	if (inc)
-		multiplier += shifting ? 0.0001f : speeding ? 1.0f : 0.01f;
-	if (dec)
-		multiplier -= shifting ? 0.0001f : speeding ? 1.0f : 0.01f;
+void TreelsApplication::run() {
+    if (reset) {
+        multiplier = 0.0f;
+        dephase = 0.0f;
+    }
+    if (inc)
+        multiplier += shifting ? 0.0001f : speeding ? 1.0f : 0.01f;
+    if (dec)
+        multiplier -= shifting ? 0.0001f : speeding ? 1.0f : 0.01f;
+    if (rol)
+        dephase += shifting ? 0.01f : 1.0f;
+    if (ror)
+        dephase -= shifting ? 0.01f : 1.0f;
 
-	if (multiplier > 180.0f)
-		multiplier -= 360.0f;
-	if (multiplier < -180.0f)
-		multiplier += 360.0f;
+    if (multiplier > 180.0f)
+        multiplier -= 360.0f;
+    if (multiplier < -180.0f)
+        multiplier += 360.0f;
+    if (dephase > 180.0f)
+        dephase -= 360.0f;
+    if (dephase < -180.0f)
+        dephase += 360.0f;
 
-	float rad;
-	for (int i = 0; i < pLines->size(); ++i) {
-		rad = i / 180.0f * (float)M_PI;
-		(*pLines)[i].from.point.x = center.point.x + ::std::cosf(rad) * (*pBalls)[0].circle.radiusX;
-		(*pLines)[i].from.point.y = center.point.y - ::std::sinf(rad) * (*pBalls)[0].circle.radiusY;
+    float rad, deph;
+    for (size_t i = 0; i < pLines.size(); ++i) {
+        rad = i / 180.0f * (float)M_PI;
+        deph = dephase / 180.0f * (float)M_PI;
 
-		(*pLines)[i].to.point.x = center.point.x + ::std::cosf(rad * multiplier) * (*pBalls)[0].circle.radiusX;
-		(*pLines)[i].to.point.y = center.point.y - ::std::sinf(rad * multiplier) * (*pBalls)[0].circle.radiusY;
-	}
+        pLines[i].from.x = center.x + ::std::cosf(rad + deph) * pBalls[0].radiusX;
+        pLines[i].from.y = center.y - ::std::sinf(rad + deph) * pBalls[0].radiusY;
+
+        pLines[i].to.x = center.x + ::std::cosf(rad * multiplier + deph) * pBalls[0].radiusX;
+        pLines[i].to.y = center.y - ::std::sinf(rad * multiplier + deph) * pBalls[0].radiusY;
+    }
 }
 
-void TreelsApplication::KeyPress(Treels::Action action, Treels::Key key) {
-	if (key == Treels::Key::EscapeKey)
-		window->Close();
-	if (key == Treels::Key::R)
-		reset = action;
-	if (key == Treels::Key::UpArrow)
-		inc = action;
-	if (key == Treels::Key::DownArrow)
-		dec = action;
-	if (key == Treels::Key::Shift)
-		shifting = action;
-	if (key == Treels::Key::Control)
-		speeding = action;
+void TreelsApplication::keyPress(Treels::Action action, Treels::Key key) {
+    if (key == Treels::Key::EscapeKey)
+        close();
+    if (key == Treels::Key::R)
+        reset = action;
+    if (key == Treels::Key::ArrowUp)
+        inc = action;
+    if (key == Treels::Key::ArrowDown)
+        dec = action;
+    if (key == Treels::Key::ArrowLeft)
+        rol = action;
+    if (key == Treels::Key::ArrowRight)
+        ror = action;
+    if (key == Treels::Key::Shift)
+        shifting = action;
+    if (key == Treels::Key::Control)
+        speeding = action;
+    if (key == Treels::Key::F11) {
+        if (action) {
+            fs = (!fs);
+            //fullscreen(fs);
+        }
+    }
 }
 
-void TreelsApplication::Resize(float newWidth, float newHeight) {
-	windowWidth = newWidth;
-	windowHeight = newHeight;
+void TreelsApplication::resize(float newWidth, float newHeight) {
+    windowWidth = newWidth;
+    windowHeight = newHeight;
 
-	center.point.x = windowWidth / 2.0f;
-	center.point.y = windowHeight / 2.0f;
-	(*pBalls)[0].circle.point = center.point;
-	(*pBalls)[0].circle.radiusX = (*pBalls)[0].circle.radiusY = (windowWidth < windowHeight ? windowWidth : windowHeight) / 2.0f;
-
-	float rad;
-	for (size_t i = 0; i < pLines->size(); ++i) {
-		rad = i / 180.0f * (float)M_PI;
-		(*pLines)[i].from.point.x = center.point.x + ::std::cosf(rad) * (*pBalls)[0].circle.radiusX;
-		(*pLines)[i].from.point.y = center.point.y - ::std::sinf(rad) * (*pBalls)[0].circle.radiusY;
-
-		(*pLines)[i].to.point.x = center.point.x + ::std::cosf(rad + rad * multiplier) * (*pBalls)[0].circle.radiusX;
-		(*pLines)[i].to.point.y = center.point.y - ::std::sinf(rad + rad * multiplier) * (*pBalls)[0].circle.radiusY;
-	}
+    center.x = windowWidth / 2.0f;
+    center.y = windowHeight / 2.0f;
+    pBalls[0].center = center;
+    pBalls[0].radiusX = pBalls[0].radiusY = (windowWidth < windowHeight ? windowWidth : windowHeight) / 2.0f;
 }
 
-void TreelsApplication::Closing() {
-	window->Unload();
+void TreelsApplication::closing() {
+    //unloadAll();
 }
